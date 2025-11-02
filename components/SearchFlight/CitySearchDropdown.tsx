@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, StyleSheet } from "react-native";
 import type { City } from "../../types/City";
