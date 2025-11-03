@@ -1,29 +1,37 @@
 import React from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import { TouchableOpacity, View, TextInput, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-const SearchBar: React.FC = () => {
+const SearchBar = () => {
+  const navigation = useNavigation<any>();
+
+  const handlePress = () => {
+    navigation.navigate("SearchFlight");
+  };
+
   return (
-    <View style={styles.container}>
-      <Ionicons name="search-outline" size={20} color="#888" />
-      <TextInput style={styles.input} placeholder="Find a flight" placeholderTextColor="#aaa" />
-    </View>
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
+      <View style={styles.container}>
+        <Ionicons name="search-outline" size={20} color="#999" />
+        <TextInput style={styles.input} placeholder="Find a flight" placeholderTextColor="#999" editable={false} />
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+    padding: 10,
     alignItems: "center",
-    backgroundColor: "#f3f3f3",
-    marginHorizontal: 20,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    marginVertical: 15,
   },
   input: {
+    marginLeft: 8,
+    color: "#333",
     flex: 1,
-    padding: 10,
   },
 });
 
