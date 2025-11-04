@@ -13,10 +13,3 @@ export interface LocationInputProps {
   value: City | null;
   onSelect: (city: City) => void;
 }
-
-export interface DatePickerProps {
-  label: string;
-  placeholder: string;
-  value: Date | null;
-  onSelect: (date: Date) => void;
-}
