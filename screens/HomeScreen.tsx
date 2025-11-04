@@ -1,8 +1,8 @@
 import React from "react";
 import { View, ScrollView, Image, StyleSheet } from "react-native";
-import Header from "../components/Header";
-import SectionHeader from "../components/SectionHeader";
-import CityCard from "../components/CityCard";
+import Header from "../components/Home/Header";
+import SectionHeader from "../components/Home/SectionHeader";
+import CityCard from "../components/Home/CityCard";
 
 const HomeScreen: React.FC = () => {
   return (

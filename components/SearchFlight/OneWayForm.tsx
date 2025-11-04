@@ -1,12 +1,14 @@
 import React from "react";
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
-import type { Airport } from "../../types/City";
+import { useNavigation } from "@react-navigation/native";
+import type { Airport } from "../../types";
 import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const OneWayForm = () => {
+  const navigation = useNavigation<any>();
   const [fromCity, setFromCity] = useState<Airport | null>(null);
   const [toCity, setToCity] = useState<Airport | null>(null);
   const [departDate, setDepartDate] = useState<Date | null>(null);
@@ -20,13 +22,14 @@ const OneWayForm = () => {
 
   const handleSearch = () => {
     if (fromCity && toCity && departDate) {
-      console.log({
-        from: fromCity,
-        to: toCity,
-        departDate,
+      // Navigate to search results
+      navigation.navigate("SearchResult", {
+        fromAirportId: fromCity.id,
+        toAirportId: toCity.id,
+        departDate: departDate.toISOString().split("T")[0],
         passengers,
+        tripType: "oneWay",
       });
-      // Navigate to search results or perform search
     }
   };
 

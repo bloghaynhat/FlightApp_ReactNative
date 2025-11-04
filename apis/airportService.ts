@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-import type { Airport } from "../types/City";
+import type { Airport } from "../types";
 
 export const airportService = {
   // Lấy tất cả airports

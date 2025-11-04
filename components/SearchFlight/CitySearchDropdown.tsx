@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, StyleSheet, ActivityIndicator } from "react-native";
-import type { Airport } from "../../types/City";
+import type { Airport } from "../../types";
 import { airportService } from "../../apis/airportService";
 
 interface CitySearchDropdownProps {

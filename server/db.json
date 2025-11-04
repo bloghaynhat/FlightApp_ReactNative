@@ -159,13 +159,61 @@
       "departureTime": "2025-12-11T07:00:00Z",
       "arrivalTime": "2025-12-11T08:20:00Z",
       "status": "Scheduled"
+    },
+    {
+      "id": "F005",
+      "flightNumber": "VN242",
+      "airlineId": "VN",
+      "fromAirportId": "SGN",
+      "toAirportId": "HAN",
+      "departureTime": "2025-12-10T14:00:00Z",
+      "arrivalTime": "2025-12-10T16:00:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F006",
+      "flightNumber": "VJ172",
+      "airlineId": "VJ",
+      "fromAirportId": "SGN",
+      "toAirportId": "HAN",
+      "departureTime": "2025-12-10T18:30:00Z",
+      "arrivalTime": "2025-12-10T20:30:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F007",
+      "flightNumber": "VN243",
+      "airlineId": "VN",
+      "fromAirportId": "HAN",
+      "toAirportId": "SGN",
+      "departureTime": "2025-12-10T16:00:00Z",
+      "arrivalTime": "2025-12-10T18:15:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F008",
+      "flightNumber": "VJ173",
+      "airlineId": "VJ",
+      "fromAirportId": "HAN",
+      "toAirportId": "SGN",
+      "departureTime": "2025-12-10T20:00:00Z",
+      "arrivalTime": "2025-12-10T22:15:00Z",
+      "status": "Scheduled"
     }
   ],
   "seatClasses": [
     { "id": "SC01", "flightId": "F001", "className": "Economy", "price": 1500000, "totalSeats": 150 },
     { "id": "SC02", "flightId": "F001", "className": "Business", "price": 3500000, "totalSeats": 20 },
     { "id": "SC03", "flightId": "F003", "className": "Eco Saver", "price": 1200000, "totalSeats": 180 },
-    { "id": "SC04", "flightId": "F004", "className": "Eco Saver", "price": 1300000, "totalSeats": 180 }
+    { "id": "SC04", "flightId": "F004", "className": "Eco Saver", "price": 1300000, "totalSeats": 180 },
+    { "id": "SC05", "flightId": "F002", "className": "Economy", "price": 1600000, "totalSeats": 150 },
+    { "id": "SC06", "flightId": "F002", "className": "Business", "price": 3600000, "totalSeats": 20 },
+    { "id": "SC07", "flightId": "F005", "className": "Economy", "price": 1550000, "totalSeats": 150 },
+    { "id": "SC08", "flightId": "F005", "className": "Business", "price": 3400000, "totalSeats": 20 },
+    { "id": "SC09", "flightId": "F006", "className": "Eco Saver", "price": 1400000, "totalSeats": 180 },
+    { "id": "SC10", "flightId": "F007", "className": "Economy", "price": 1650000, "totalSeats": 150 },
+    { "id": "SC11", "flightId": "F007", "className": "Business", "price": 3700000, "totalSeats": 20 },
+    { "id": "SC12", "flightId": "F008", "className": "Eco Saver", "price": 1450000, "totalSeats": 180 }
   ],
   "bookingOrders": [
     {

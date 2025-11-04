@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { City } from "../types/City";
+import { Airport } from "../../types";
 
 interface CityCardProps {
-  city: City;
+  city: Airport;
 }
 
 const CityCard: React.FC<CityCardProps> = ({ city }) => {
@@ -11,7 +11,7 @@ const CityCard: React.FC<CityCardProps> = ({ city }) => {
     <TouchableOpacity style={styles.card}>
       <Image source={{ uri: city.image }} style={styles.image} />
       <Text style={styles.name}>{city.name}</Text>
-      <Text style={styles.price}>{city.priceRange}</Text>
+      {/* <Text style={styles.price}>{city.priceRange}</Text> */}
     </TouchableOpacity>
   );
 };

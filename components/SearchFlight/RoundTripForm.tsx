@@ -1,12 +1,14 @@
 import React from "react";
 import { View, TextInput, StyleSheet, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
-import type { Airport } from "../../types/City";
+import { useNavigation } from "@react-navigation/native";
+import type { Airport } from "../../types";
 import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const RoundTripForm = () => {
+  const navigation = useNavigation<any>();
   const [fromCity, setFromCity] = useState<Airport | null>(null);
   const [toCity, setToCity] = useState<Airport | null>(null);
   const [departDate, setDepartDate] = useState<Date | null>(null);
@@ -21,14 +23,15 @@ const RoundTripForm = () => {
 
   const handleSearch = () => {
     if (fromCity && toCity && departDate) {
-      console.log({
-        from: fromCity,
-        to: toCity,
-        departDate,
-        returnDate,
+      // Navigate to search results
+      navigation.navigate("SearchResult", {
+        fromAirportId: fromCity.id,
+        toAirportId: toCity.id,
+        departDate: departDate.toISOString().split("T")[0],
+        returnDate: returnDate ? returnDate.toISOString().split("T")[0] : undefined,
         passengers,
+        tripType: "roundTrip",
       });
-      // Navigate to search results or perform search
     }
   };
 
