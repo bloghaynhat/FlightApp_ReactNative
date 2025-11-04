@@ -1,25 +1,109 @@
 {
-  "cities": [
-    { "id": 1, "name": "Hồ Chí Minh", "country": "Vietnam" },
-    { "id": 2, "name": "Hà Nội", "country": "Vietnam" },
-    { "id": 3, "name": "Đà Nẵng", "country": "Vietnam" },
-    { "id": 4, "name": "Cần Thơ", "country": "Vietnam" },
-    { "id": 5, "name": "Hải Phòng", "country": "Vietnam" },
-    { "id": 6, "name": "Huế", "country": "Vietnam" },
-    { "id": 7, "name": "Nha Trang", "country": "Vietnam" },
-    { "id": 8, "name": "Phú Quốc", "country": "Vietnam" },
-    { "id": 9, "name": "Đà Lạt", "country": "Vietnam" }
-  ],
   "airports": [
-    { "id": "SGN", "name": "Sân bay Tân Sơn Nhất", "code": "SGN", "cityId": 1 },
-    { "id": "HAN", "name": "Sân bay Nội Bài", "code": "HAN", "cityId": 2 },
-    { "id": "DAD", "name": "Sân bay Đà Nẵng", "code": "DAD", "cityId": 3 },
-    { "id": "VCA", "name": "Sân bay Cần Thơ", "code": "VCA", "cityId": 4 },
-    { "id": "HPH", "name": "Sân bay Cát Bi", "code": "HPH", "cityId": 5 },
-    { "id": "HUI", "name": "Sân bay Phú Bài", "code": "HUI", "cityId": 6 },
-    { "id": "CXR", "name": "Sân bay Cam Ranh", "code": "CXR", "cityId": 7 },
-    { "id": "PQC", "name": "Sân bay Phú Quốc", "code": "PQC", "cityId": 8 },
-    { "id": "DLI", "name": "Sân bay Liên Khương", "code": "DLI", "cityId": 9 }
+    {
+      "id": "SGN",
+      "name": "Sân bay Tân Sơn Nhất",
+      "code": "SGN",
+      "city": "Hồ Chí Minh",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Tan_Son_Nhat_International_Airport_%28SGN%29.jpg"
+    },
+    {
+      "id": "HAN",
+      "name": "Sân bay Nội Bài",
+      "code": "HAN",
+      "city": "Hà Nội",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/05/Noi_Bai_International_Airport_Terminal_2.jpg"
+    },
+    {
+      "id": "DAD",
+      "name": "Sân bay Đà Nẵng",
+      "code": "DAD",
+      "city": "Đà Nẵng",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/23/Da_Nang_Airport_Terminal_2.jpg"
+    },
+    {
+      "id": "CXR",
+      "name": "Sân bay Cam Ranh",
+      "code": "CXR",
+      "city": "Nha Trang",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Cam_Ranh_International_Airport_terminal_2018.jpg"
+    },
+    {
+      "id": "PQC",
+      "name": "Sân bay Phú Quốc",
+      "code": "PQC",
+      "city": "Phú Quốc",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/4/41/Phu_Quoc_International_Airport_Terminal_2018.jpg"
+    },
+    {
+      "id": "HUI",
+      "name": "Sân bay Phú Bài",
+      "code": "HUI",
+      "city": "Huế",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Phu_Bai_International_Airport_Terminal_2.jpg"
+    },
+    {
+      "id": "VCA",
+      "name": "Sân bay Cần Thơ",
+      "code": "VCA",
+      "city": "Cần Thơ",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Can_Tho_Airport_Terminal.jpg"
+    },
+    {
+      "id": "HPH",
+      "name": "Sân bay Cát Bi",
+      "code": "HPH",
+      "city": "Hải Phòng",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Cat_Bi_Airport_Terminal.jpg"
+    },
+    {
+      "id": "VII",
+      "name": "Sân bay Vinh",
+      "code": "VII",
+      "city": "Nghệ An",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Vinh_Airport_Terminal.jpg"
+    },
+    {
+      "id": "THD",
+      "name": "Sân bay Thọ Xuân",
+      "code": "THD",
+      "city": "Thanh Hóa",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/97/Tho_Xuan_Airport_Terminal.jpg"
+    },
+    {
+      "id": "DLI",
+      "name": "Sân bay Liên Khương",
+      "code": "DLI",
+      "city": "Đà Lạt",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Lien_Khuong_Airport_Terminal.jpg"
+    },
+    {
+      "id": "TBB",
+      "name": "Sân bay Tuy Hòa",
+      "code": "TBB",
+      "city": "Phú Yên",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/84/Tuy_Hoa_Airport_Terminal.jpg"
+    },
+    {
+      "id": "VCS",
+      "name": "Sân bay Côn Đảo",
+      "code": "VCS",
+      "city": "Côn Đảo",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Con_Dao_Airport.jpg"
+    }
   ],
   "airlines": [
     {

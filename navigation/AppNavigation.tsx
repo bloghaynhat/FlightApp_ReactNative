@@ -10,12 +10,6 @@ import { View, Text } from "react-native";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const ExploreScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text>Explore Screen</Text>
-  </View>
-);
-
 const ProfileScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     <Text>Profile Screen</Text>
@@ -25,7 +19,6 @@ const ProfileScreen = () => (
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="HomeMain" component={HomeScreen} />
-    <Stack.Screen name="SearchFlight" component={SearchFlightScreen} />
   </Stack.Navigator>
 );
 
@@ -36,7 +29,7 @@ const BottomTabs = () => (
       tabBarIcon: ({ color, size }) => {
         let iconName: keyof typeof Ionicons.glyphMap;
         if (route.name === "Home") iconName = "home-outline";
-        else if (route.name === "Explore") iconName = "airplane-outline";
+        else if (route.name === "BookFlight") iconName = "airplane-outline";
         else iconName = "person-outline";
         return <Ionicons name={iconName} size={size} color={color} />;
       },
@@ -44,9 +37,16 @@ const BottomTabs = () => (
       tabBarInactiveTintColor: "gray",
     })}
   >
-    <Tab.Screen name="Home" component={HomeStack} />
-    <Tab.Screen name="Explore" component={ExploreScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Screen name="Home" component={HomeStack} options={{ tabBarLabel: "Trang chủ" }} />
+    <Tab.Screen
+      name="BookFlight"
+      component={SearchFlightScreen}
+      options={{
+        tabBarLabel: "Đặt vé",
+        tabBarStyle: { display: "none" },
+      }}
+    />
+    <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Tài khoản" }} />
   </Tab.Navigator>
 );
 
