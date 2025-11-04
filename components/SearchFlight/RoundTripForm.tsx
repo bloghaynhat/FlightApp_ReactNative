@@ -6,7 +6,6 @@ import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-
 const RoundTripForm = () => {
   const [fromCity, setFromCity] = useState<City | null>(null);
   const [toCity, setToCity] = useState<City | null>(null);
@@ -43,19 +42,18 @@ const RoundTripForm = () => {
 
       <View style={styles.formContainer}>
         <View style={styles.locationContainer}>
-        {/* From Location */}
-        <LocationInput label="Từ" placeholder="Chọn thành phố khởi hành" value={fromCity} onSelect={setFromCity} />
+          {/* From Location */}
+          <LocationInput label="Từ" placeholder="Chọn thành phố khởi hành" value={fromCity} onSelect={setFromCity} />
 
-        {/* Swap Button */}
-        <TouchableOpacity style={styles.swapButton} onPress={handleSwapCities}>
-          <Ionicons name="swap-vertical" size={22} color="#333" />
-        </TouchableOpacity>
+          {/* Swap Button */}
+          <TouchableOpacity style={styles.swapButton} onPress={handleSwapCities}>
+            <Ionicons name="swap-vertical" size={22} color="#333" />
+          </TouchableOpacity>
 
-        {/* To Location */}
-        <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} />
-
+          {/* To Location */}
+          <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} />
         </View>
-        
+
         {/* Divider */}
         <View style={styles.divider} />
 
@@ -66,6 +64,7 @@ const RoundTripForm = () => {
             setDepartDate(start);
             setReturnDate(end);
           }}
+          mode="range"
         />
 
         {/* Divider */}
@@ -130,21 +129,21 @@ const styles = StyleSheet.create({
   },
   locationContainer: {
     position: "relative",
-    height: "auto"
+    height: "auto",
   },
   swapButton: {
-  width: 44,
-  height: 44,
-  borderRadius: 22,
-  backgroundColor: "#f0f0f0",
-  justifyContent: "center",
-  alignItems: "center",
-  position: "absolute",
-  right: 16,
-  top: "50%",
-  transform: [{ translateY: -22 }], // -1/2 chiều cao của nút
-  zIndex: 10, // ✅ nổi lên trên các phần tử khác
-},
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    right: 16,
+    top: "50%",
+    transform: [{ translateY: -22 }], // -1/2 chiều cao của nút
+    zIndex: 10, // ✅ nổi lên trên các phần tử khác
+  },
   divider: {
     height: 1,
     backgroundColor: "#eee",
