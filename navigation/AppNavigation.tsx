@@ -6,6 +6,7 @@ import HomeScreen from "../screens/HomeScreen";
 import SearchFlightScreen from "../screens/SearchFlightScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
+import PaymentInfoScreen from "../screens/PaymentInfoScreen ";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -24,7 +25,7 @@ const ProfileScreen = () => (
 
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="HomeMain" component={HomeScreen} />
+    <Stack.Screen name="HomeMain" component={PaymentInfoScreen} />
     <Stack.Screen name="SearchFlight" component={SearchFlightScreen} />
   </Stack.Navigator>
 );
