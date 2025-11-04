@@ -3,7 +3,6 @@ import { View, ScrollView, Image, StyleSheet } from "react-native";
 import Header from "../components/Header";
 import SectionHeader from "../components/SectionHeader";
 import CityCard from "../components/CityCard";
-import { bestCities } from "../data/cities";
 
 const HomeScreen: React.FC = () => {
   return (
@@ -11,11 +10,11 @@ const HomeScreen: React.FC = () => {
       <Header />
 
       <SectionHeader title="The best cities for you" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-        {bestCities.map((city) => (
+      {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+        {Array.from().map((city) => (
           <CityCard key={city.id} city={city} />
         ))}
-      </ScrollView>
+      </ScrollView> */}
 
       <SectionHeader title="Explore Destinations" />
       <Image

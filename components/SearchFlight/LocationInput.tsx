@@ -1,16 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import type { City } from "../../types/City";
+import type { Airport, LocationInputProps } from "../../types/City";
 import { CitySearchDropdown } from "./CitySearchDropdown";
-
-interface LocationInputProps {
-  label: string;
-  placeholder: string;
-  value: City | null;
-  onSelect: (city: City) => void;
-  iconName?: string;
-}
 
 export const LocationInput: React.FC<LocationInputProps> = ({
   label,

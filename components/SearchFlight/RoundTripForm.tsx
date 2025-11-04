@@ -1,14 +1,14 @@
 import React from "react";
 import { View, TextInput, StyleSheet, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
-import type { City } from "../../types/City";
+import type { Airport } from "../../types/City";
 import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const RoundTripForm = () => {
-  const [fromCity, setFromCity] = useState<City | null>(null);
-  const [toCity, setToCity] = useState<City | null>(null);
+  const [fromCity, setFromCity] = useState<Airport | null>(null);
+  const [toCity, setToCity] = useState<Airport | null>(null);
   const [departDate, setDepartDate] = useState<Date | null>(null);
   const [returnDate, setReturnDate] = useState<Date | null>(null);
   const [passengers, setPassengers] = useState<number>(1);
@@ -43,7 +43,13 @@ const RoundTripForm = () => {
       <View style={styles.formContainer}>
         <View style={styles.locationContainer}>
           {/* From Location */}
-          <LocationInput label="Từ" placeholder="Chọn thành phố khởi hành" value={fromCity} onSelect={setFromCity} />
+          <LocationInput
+            label="Từ"
+            placeholder="Chọn thành phố khởi hành"
+            value={fromCity}
+            onSelect={setFromCity}
+            iconName=""
+          />
 
           {/* Swap Button */}
           <TouchableOpacity style={styles.swapButton} onPress={handleSwapCities}>
@@ -51,7 +57,7 @@ const RoundTripForm = () => {
           </TouchableOpacity>
 
           {/* To Location */}
-          <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} />
+          <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} iconName="" />
         </View>
 
         {/* Divider */}
