@@ -7,35 +7,54 @@ import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const RoundTripForm = () => {
+interface RoundTripFormProps {
+  fromCity: Airport | null;
+  toCity: Airport | null;
+  departDate: Date | null;
+  returnDate: Date | null;
+  passengers: number;
+  onFromCityChange: (city: Airport | null) => void;
+  onToCityChange: (city: Airport | null) => void;
+  onDepartDateChange: (date: Date | null) => void;
+  onReturnDateChange: (date: Date | null) => void;
+  onPassengersChange: (count: number) => void;
+}
+
+const RoundTripForm: React.FC<RoundTripFormProps> = ({
+  fromCity,
+  toCity,
+  departDate,
+  returnDate,
+  passengers,
+  onFromCityChange,
+  onToCityChange,
+  onDepartDateChange,
+  onReturnDateChange,
+  onPassengersChange,
+}) => {
   const navigation = useNavigation<any>();
-  const [fromCity, setFromCity] = useState<Airport | null>(null);
-  const [toCity, setToCity] = useState<Airport | null>(null);
-  const [departDate, setDepartDate] = useState<Date | null>(null);
-  const [returnDate, setReturnDate] = useState<Date | null>(null);
-  const [passengers, setPassengers] = useState<number>(1);
 
   const handleSwapCities = () => {
     const temp = fromCity;
-    setFromCity(toCity);
-    setToCity(temp);
+    onFromCityChange(toCity);
+    onToCityChange(temp);
   };
 
   const handleSearch = () => {
-    if (fromCity && toCity && departDate) {
+    if (fromCity && toCity && departDate && returnDate) {
       // Navigate to search results
       navigation.navigate("SearchResult", {
         fromAirportId: fromCity.id,
         toAirportId: toCity.id,
         departDate: departDate.toISOString().split("T")[0],
-        returnDate: returnDate ? returnDate.toISOString().split("T")[0] : undefined,
+        returnDate: returnDate.toISOString().split("T")[0],
         passengers,
         tripType: "roundTrip",
       });
     }
   };
 
-  const isFormValid = fromCity && toCity && departDate;
+  const isFormValid = fromCity && toCity && departDate && returnDate;
 
   return (
     <ScrollView style={styles.container}>
@@ -50,7 +69,7 @@ const RoundTripForm = () => {
             label="Từ"
             placeholder="Chọn thành phố khởi hành"
             value={fromCity}
-            onSelect={setFromCity}
+            onSelect={onFromCityChange}
             iconName=""
           />
 
@@ -60,7 +79,13 @@ const RoundTripForm = () => {
           </TouchableOpacity>
 
           {/* To Location */}
-          <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} iconName="" />
+          <LocationInput
+            label="Đến"
+            placeholder="Chọn thành phố đến"
+            value={toCity}
+            onSelect={onToCityChange}
+            iconName=""
+          />
         </View>
 
         {/* Divider */}
@@ -70,8 +95,8 @@ const RoundTripForm = () => {
           startDate={departDate}
           endDate={returnDate}
           onSelect={(start, end) => {
-            setDepartDate(start);
-            setReturnDate(end);
+            onDepartDateChange(start);
+            onReturnDateChange(end);
           }}
           mode="range"
         />
@@ -87,14 +112,14 @@ const RoundTripForm = () => {
               <View style={styles.passengerCounter}>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => setPassengers(Math.max(1, passengers - 1))}
+                  onPress={() => onPassengersChange(Math.max(1, passengers - 1))}
                 >
                   <Ionicons name="remove" size={20} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.passengerValue}>{passengers}</Text>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => setPassengers(Math.min(9, passengers + 1))}
+                  onPress={() => onPassengersChange(Math.min(9, passengers + 1))}
                 >
                   <Ionicons name="add" size={20} color="#333" />
                 </TouchableOpacity>

@@ -7,17 +7,33 @@ import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const OneWayForm = () => {
+interface OneWayFormProps {
+  fromCity: Airport | null;
+  toCity: Airport | null;
+  departDate: Date | null;
+  passengers: number;
+  onFromCityChange: (city: Airport | null) => void;
+  onToCityChange: (city: Airport | null) => void;
+  onDepartDateChange: (date: Date | null) => void;
+  onPassengersChange: (count: number) => void;
+}
+
+const OneWayForm: React.FC<OneWayFormProps> = ({
+  fromCity,
+  toCity,
+  departDate,
+  passengers,
+  onFromCityChange,
+  onToCityChange,
+  onDepartDateChange,
+  onPassengersChange,
+}) => {
   const navigation = useNavigation<any>();
-  const [fromCity, setFromCity] = useState<Airport | null>(null);
-  const [toCity, setToCity] = useState<Airport | null>(null);
-  const [departDate, setDepartDate] = useState<Date | null>(null);
-  const [passengers, setPassengers] = useState<number>(1);
 
   const handleSwapCities = () => {
     const temp = fromCity;
-    setFromCity(toCity);
-    setToCity(temp);
+    onFromCityChange(toCity);
+    onToCityChange(temp);
   };
 
   const handleSearch = () => {
@@ -48,7 +64,7 @@ const OneWayForm = () => {
             label="Từ"
             placeholder="Chọn thành phố khởi hành"
             value={fromCity}
-            onSelect={setFromCity}
+            onSelect={onFromCityChange}
             iconName=""
           />
 
@@ -58,7 +74,13 @@ const OneWayForm = () => {
           </TouchableOpacity>
 
           {/* To Location */}
-          <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} iconName="" />
+          <LocationInput
+            label="Đến"
+            placeholder="Chọn thành phố đến"
+            value={toCity}
+            onSelect={onToCityChange}
+            iconName=""
+          />
         </View>
 
         {/* Divider */}
@@ -68,7 +90,7 @@ const OneWayForm = () => {
           startDate={departDate}
           endDate={null}
           onSelect={(start) => {
-            setDepartDate(start);
+            onDepartDateChange(start);
           }}
           mode="single"
         />
@@ -84,14 +106,14 @@ const OneWayForm = () => {
               <View style={styles.passengerCounter}>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => setPassengers(Math.max(1, passengers - 1))}
+                  onPress={() => onPassengersChange(Math.max(1, passengers - 1))}
                 >
                   <Ionicons name="remove" size={20} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.passengerValue}>{passengers}</Text>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => setPassengers(Math.min(9, passengers + 1))}
+                  onPress={() => onPassengersChange(Math.min(9, passengers + 1))}
                 >
                   <Ionicons name="add" size={20} color="#333" />
                 </TouchableOpacity>
