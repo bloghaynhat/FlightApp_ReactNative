@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import SearchFlightScreen from "../screens/SearchFlightScreen";
 import SearchResultScreen from "../screens/SearchResultScreen";
+import PassengerInfoScreen from "../screens/PassengerInfoScreen";
+import ReturnFlightSelectionScreen from "../screens/ReturnFlightSelectionScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
 
@@ -56,6 +58,8 @@ const AppNavigator = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={BottomTabs} />
       <Stack.Screen name="SearchResult" component={SearchResultScreen} />
+      <Stack.Screen name="ReturnFlightSelection" component={ReturnFlightSelectionScreen} />
+      <Stack.Screen name="PassengerInfo" component={PassengerInfoScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

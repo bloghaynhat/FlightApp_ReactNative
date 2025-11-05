@@ -70,8 +70,28 @@ const SearchResultScreen: React.FC = () => {
   };
 
   const handleFlightPress = (flight: FlightResult) => {
-    // TODO: Navigate to flight details
-    console.log("Selected flight:", flight);
+    // Navigate to passenger info for OneWay
+    if (tripType === "oneWay") {
+      (navigation as any).navigate("PassengerInfo", {
+        flight,
+        fromAirport,
+        toAirport,
+        departDate,
+        passengers,
+        tripType,
+      });
+    } else {
+      // For RoundTrip: Navigate to return flight selection
+      (navigation as any).navigate("ReturnFlightSelection", {
+        outboundFlight: flight,
+        fromAirportId: fromAirportId,
+        toAirportId: toAirportId,
+        departDate,
+        returnDate,
+        passengers,
+        tripType,
+      });
+    }
   };
 
   const handleModifySearch = () => {
