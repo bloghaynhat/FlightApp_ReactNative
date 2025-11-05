@@ -1,17 +1,15 @@
-"use client";
-
 import React from "react";
 import { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import type { City } from "../../types/City";
+import type { Airport } from "../../types";
 import { CitySearchDropdown } from "./CitySearchDropdown";
 
-interface LocationInputProps {
+export interface LocationInputProps {
   label: string;
   placeholder: string;
-  value: City | null;
-  onSelect: (city: City) => void;
-  iconName?: string;
+  value: Airport | null;
+  onSelect: (airport: Airport) => void;
+  iconName: string;
 }
 
 export const LocationInput: React.FC<LocationInputProps> = ({
@@ -34,7 +32,6 @@ export const LocationInput: React.FC<LocationInputProps> = ({
           <Text style={styles.value}>{value ? `${value.name} (${value.code})` : placeholder}</Text>
         </View>
       </TouchableOpacity>
-
       <CitySearchDropdown visible={showDropdown} onSelect={onSelect} onClose={() => setShowDropdown(false)} />
     </>
   );

@@ -4,18 +4,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import SearchFlightScreen from "../screens/SearchFlightScreen";
+import SearchResultScreen from "../screens/SearchResultScreen";
+import PassengerInfoScreen from "../screens/PassengerInfoScreen";
+import ReturnFlightSelectionScreen from "../screens/ReturnFlightSelectionScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
 import PaymentInfoScreen from "../screens/PaymentInfoScreen ";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-
-const ExploreScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text>Explore Screen</Text>
-  </View>
-);
 
 const ProfileScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -37,7 +34,7 @@ const BottomTabs = () => (
       tabBarIcon: ({ color, size }) => {
         let iconName: keyof typeof Ionicons.glyphMap;
         if (route.name === "Home") iconName = "home-outline";
-        else if (route.name === "Explore") iconName = "airplane-outline";
+        else if (route.name === "BookFlight") iconName = "airplane-outline";
         else iconName = "person-outline";
         return <Ionicons name={iconName} size={size} color={color} />;
       },
@@ -45,15 +42,27 @@ const BottomTabs = () => (
       tabBarInactiveTintColor: "gray",
     })}
   >
-    <Tab.Screen name="Home" component={HomeStack} />
-    <Tab.Screen name="Explore" component={ExploreScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Screen name="Home" component={HomeStack} options={{ tabBarLabel: "Trang chủ" }} />
+    <Tab.Screen
+      name="BookFlight"
+      component={SearchFlightScreen}
+      options={{
+        tabBarLabel: "Đặt vé",
+        tabBarStyle: { display: "none" },
+      }}
+    />
+    <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Tài khoản" }} />
   </Tab.Navigator>
 );
 
 const AppNavigator = () => (
   <NavigationContainer>
-    <BottomTabs />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={BottomTabs} />
+      <Stack.Screen name="SearchResult" component={SearchResultScreen} />
+      <Stack.Screen name="ReturnFlightSelection" component={ReturnFlightSelectionScreen} />
+      <Stack.Screen name="PassengerInfo" component={PassengerInfoScreen} />
+    </Stack.Navigator>
   </NavigationContainer>
 );
 

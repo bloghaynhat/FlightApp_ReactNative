@@ -7,7 +7,8 @@ const SearchBar = () => {
   const navigation = useNavigation<any>();
 
   const handlePress = () => {
-    navigation.navigate("SearchFlight");
+    // Navigate to root stack's SearchFlight screen
+    navigation.getParent()?.navigate("SearchFlight");
   };
 
   return (
