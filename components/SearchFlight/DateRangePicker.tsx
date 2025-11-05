@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Modal, View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -7,9 +7,15 @@ type DateRangePickerProps = {
   startDate: Date | null;
   endDate: Date | null;
   onSelect: (start: Date | null, end: Date | null) => void;
+  mode?: "single" | "range"; // Thêm prop mode
 };
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({ startDate, endDate, onSelect }) => {
+const DateRangePicker: React.FC<DateRangePickerProps> = ({
+  startDate,
+  endDate,
+  onSelect,
+  mode = "range", // Mặc định là range
+}) => {
   const [visible, setVisible] = useState(false);
   const [selectingDepart, setSelectingDepart] = useState(true);
   const [selectedRange, setSelectedRange] = useState<{ start?: string; end?: string }>({
@@ -17,134 +23,179 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ startDate, endDate, o
     end: endDate ? endDate.toISOString().split("T")[0] : undefined,
   });
 
-  const formatDate = (dateString?: string) => {
+  // Memoize formatDate function
+  const formatDate = useCallback((dateString?: string) => {
     if (!dateString) return "";
     const [year, month, day] = dateString.split("-");
     return `${day}/${month}/${year}`;
-  };
+  }, []);
 
-  const onDayPress = (day: DateData) => {
-    const { dateString } = day;
-    let newRange = { ...selectedRange };
+  // Memoize onDayPress để tránh tạo lại function mỗi lần render
+  const onDayPress = useCallback(
+    (day: DateData) => {
+      const { dateString } = day;
+      let newRange = { ...selectedRange };
 
-    if (selectingDepart) {
-      // Nếu đang chọn ngày đi
-      if (newRange.end && new Date(dateString) > new Date(newRange.end)) {
-        // Nếu ngày đi mới lớn hơn ngày về hiện tại, xóa ngày về
-        newRange = { start: dateString, end: undefined };
-      } else {
+      if (mode === "single") {
+        // Chế độ chọn 1 ngày - chỉ cập nhật, không tự động xác nhận
         newRange.start = dateString;
+        newRange.end = undefined;
+        setSelectedRange(newRange);
+        return;
       }
-      setSelectingDepart(false); // Chuyển sang chọn ngày về
-    } else {
-      // Nếu đang chọn ngày về
-      if (newRange.start && new Date(dateString) < new Date(newRange.start)) {
-        // Nếu ngày về mới nhỏ hơn ngày đi, cập nhật cả hai
-        newRange = { start: dateString, end: newRange.start };
+
+      // Chế độ chọn range (code cũ)
+      if (selectingDepart) {
+        // Nếu đang chọn ngày đi
+        if (newRange.end && new Date(dateString) > new Date(newRange.end)) {
+          // Nếu ngày đi mới lớn hơn ngày về hiện tại, xóa ngày về
+          newRange = { start: dateString, end: undefined };
+        } else {
+          newRange.start = dateString;
+        }
+        setSelectingDepart(false); // Chuyển sang chọn ngày về
       } else {
-        newRange.end = dateString;
+        // Nếu đang chọn ngày về
+        if (newRange.start && new Date(dateString) < new Date(newRange.start)) {
+          // Nếu ngày về mới nhỏ hơn ngày đi, cập nhật cả hai
+          newRange = { start: dateString, end: newRange.start };
+        } else {
+          newRange.end = dateString;
+        }
       }
-    }
-    setSelectedRange(newRange);
-  };
+      setSelectedRange(newRange);
+    },
+    [mode, selectingDepart, selectedRange]
+  );
 
-  const handleConfirm = (range = selectedRange) => {
-    const start = range.start ? new Date(range.start) : null;
-    const end = range.end ? new Date(range.end) : null;
-    onSelect(start, end);
-    setVisible(false);
-    setSelectingDepart(true); // Reset về chọn ngày đi cho lần sau
-  };
+  // Memoize handleConfirm
+  const handleConfirm = useCallback(
+    (range = selectedRange) => {
+      const start = range.start ? new Date(range.start) : null;
+      const end = range.end ? new Date(range.end) : null;
+      onSelect(start, end);
+      setVisible(false);
+      setSelectingDepart(true); // Reset về chọn ngày đi cho lần sau
+    },
+    [selectedRange, onSelect]
+  );
 
-  const openPicker = (isDepart: boolean) => {
+  // Memoize openPicker
+  const openPicker = useCallback((isDepart: boolean) => {
     setSelectingDepart(isDepart);
     setVisible(true);
-  };
+  }, []);
 
-  const markedDates: Record<string, any> = {};
-  if (selectedRange.start) {
-    markedDates[selectedRange.start] = {
-      startingDay: true,
-      color: "#00adf5",
-      textColor: "#fff",
-    };
-  }
-  if (selectedRange.end) {
-    markedDates[selectedRange.end] = {
-      endingDay: true,
-      color: "#00adf5",
-      textColor: "#fff",
-    };
+  // Memoize handleCancel
+  const handleCancel = useCallback(() => {
+    setVisible(false);
+  }, []);
 
-    // Đánh dấu các ngày ở giữa
+  // Memoize markedDates - chỉ tính toán lại khi selectedRange hoặc mode thay đổi
+  const markedDates = useMemo(() => {
+    const marks: Record<string, any> = {};
+
     if (selectedRange.start) {
-      let current = new Date(selectedRange.start);
-      const end = new Date(selectedRange.end);
-      while (current < end) {
-        const date = current.toISOString().split("T")[0];
-        if (date !== selectedRange.start && date !== selectedRange.end) {
-          markedDates[date] = { color: "#a7e3ff", textColor: "#000" };
+      marks[selectedRange.start] = {
+        startingDay: mode === "range",
+        selected: true,
+        color: "#00adf5",
+        textColor: "#fff",
+      };
+    }
+
+    if (selectedRange.end) {
+      marks[selectedRange.end] = {
+        endingDay: mode === "range",
+        selected: true,
+        color: "#00adf5",
+        textColor: "#fff",
+      };
+
+      // Đánh dấu các ngày ở giữa (chỉ khi mode = 'range')
+      if (mode === "range" && selectedRange.start) {
+        let current = new Date(selectedRange.start);
+        const end = new Date(selectedRange.end);
+        while (current < end) {
+          const date = current.toISOString().split("T")[0];
+          if (date !== selectedRange.start && date !== selectedRange.end) {
+            marks[date] = { color: "#a7e3ff", textColor: "#000" };
+          }
+          current.setDate(current.getDate() + 1);
         }
-        current.setDate(current.getDate() + 1);
       }
     }
-  }
+
+    return marks;
+  }, [selectedRange.start, selectedRange.end, mode]);
+
+  // Memoize minDate
+  const minDate = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  // Memoize modal title
+  const modalTitle = useMemo(() => {
+    if (mode === "single") {
+      return "Chọn ngày đi";
+    }
+    return selectingDepart ? "Chọn ngày đi" : "Chọn ngày về";
+  }, [mode, selectingDepart]);
+
+  // Memoize formatted dates
+  const formattedStartDate = useMemo(
+    () => (selectedRange.start ? formatDate(selectedRange.start) : "Chọn ngày"),
+    [selectedRange.start, formatDate]
+  );
+
+  const formattedEndDate = useMemo(
+    () => (selectedRange.end ? formatDate(selectedRange.end) : "Chọn ngày"),
+    [selectedRange.end, formatDate]
+  );
 
   return (
     <View>
-      <View style={styles.dateInputsContainer}>
+      <View style={mode === "single" ? styles.dateInputsContainerSingle : styles.dateInputsContainer}>
         {/* Ô chọn ngày đi */}
         <TouchableOpacity
-          style={[styles.dateInput, styles.dateInputLeft]}
+          style={[styles.dateInput, mode === "single" ? styles.dateInputFull : styles.dateInputLeft]}
           onPress={() => openPicker(true)}
         >
           <View>
             <Text style={styles.dateLabel}>Ngày đi</Text>
-            <Text style={styles.dateValue}>
-              {selectedRange.start ? formatDate(selectedRange.start) : "Chọn ngày"}
-            </Text>
+            <Text style={styles.dateValue}>{formattedStartDate}</Text>
           </View>
           <Ionicons name="calendar-outline" size={20} color="#666" />
         </TouchableOpacity>
 
-        {/* Ô chọn ngày về */}
-        <TouchableOpacity
-          style={[styles.dateInput, styles.dateInputRight]}
-          onPress={() => openPicker(false)}
-        >
-          <View>
-            <Text style={styles.dateLabel}>Ngày về</Text>
-            <Text style={styles.dateValue}>
-              {selectedRange.end ? formatDate(selectedRange.end) : "Chọn ngày"}
-            </Text>
-          </View>
-          <Ionicons name="calendar-outline" size={20} color="#666" />
-        </TouchableOpacity>
+        {/* Ô chọn ngày về - chỉ hiện khi mode = "range" */}
+        {mode === "range" && (
+          <TouchableOpacity style={[styles.dateInput, styles.dateInputRight]} onPress={() => openPicker(false)}>
+            <View>
+              <Text style={styles.dateLabel}>Ngày về</Text>
+              <Text style={styles.dateValue}>{formattedEndDate}</Text>
+            </View>
+            <Ionicons name="calendar-outline" size={20} color="#666" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <Modal visible={visible} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>
-              {selectingDepart ? "Chọn ngày đi" : "Chọn ngày về"}
-            </Text>
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
           </View>
           <Calendar
-            markingType="period"
+            markingType={mode === "range" ? "period" : undefined}
             markedDates={markedDates}
             onDayPress={onDayPress}
-            minDate={new Date().toISOString().split("T")[0]}
-            monthFormat={'MM/yyyy'}
+            minDate={minDate}
+            monthFormat={"MM/yyyy"}
             hideExtraDays={true}
           />
           <View style={styles.buttonRow}>
-            <TouchableOpacity onPress={() => setVisible(false)} style={[styles.button, styles.cancel]}>
+            <TouchableOpacity onPress={handleCancel} style={[styles.button, styles.cancel]}>
               <Text style={styles.buttonText}>Hủy</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => handleConfirm()}
-              style={[styles.button, styles.confirm]}
-            >
+            <TouchableOpacity onPress={() => handleConfirm()} style={[styles.button, styles.confirm]}>
               <Text style={[styles.buttonText, { color: "#fff" }]}>Xác nhận</Text>
             </TouchableOpacity>
           </View>
@@ -159,6 +210,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
+  dateInputsContainerSingle: {
+    flexDirection: "row",
+  },
   dateInput: {
     flex: 1,
     padding: 12,
@@ -167,6 +221,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  dateInputFull: {
+    borderRightWidth: 0,
   },
   dateInputLeft: {
     borderRightWidth: 0,

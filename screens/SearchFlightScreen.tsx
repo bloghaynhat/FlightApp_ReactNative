@@ -5,17 +5,49 @@ import OneWayForm from "../components/SearchFlight/OneWayForm";
 import MultiCityForm from "../components/SearchFlight/MultiCityForm";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import type { Airport } from "../types";
 
 const FlightSearchScreen = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<"round" | "oneway" | "multi">("round");
 
+  // Shared state across all forms
+  const [sharedFromCity, setSharedFromCity] = useState<Airport | null>(null);
+  const [sharedToCity, setSharedToCity] = useState<Airport | null>(null);
+  const [sharedDepartDate, setSharedDepartDate] = useState<Date | null>(null);
+  const [sharedReturnDate, setSharedReturnDate] = useState<Date | null>(null);
+  const [sharedPassengers, setSharedPassengers] = useState<number>(1);
+
   const renderTab = () => {
     switch (activeTab) {
       case "round":
-        return <RoundTripForm />;
+        return (
+          <RoundTripForm
+            fromCity={sharedFromCity}
+            toCity={sharedToCity}
+            departDate={sharedDepartDate}
+            returnDate={sharedReturnDate}
+            passengers={sharedPassengers}
+            onFromCityChange={setSharedFromCity}
+            onToCityChange={setSharedToCity}
+            onDepartDateChange={setSharedDepartDate}
+            onReturnDateChange={setSharedReturnDate}
+            onPassengersChange={setSharedPassengers}
+          />
+        );
       case "oneway":
-        return <OneWayForm />;
+        return (
+          <OneWayForm
+            fromCity={sharedFromCity}
+            toCity={sharedToCity}
+            departDate={sharedDepartDate}
+            passengers={sharedPassengers}
+            onFromCityChange={setSharedFromCity}
+            onToCityChange={setSharedToCity}
+            onDepartDateChange={setSharedDepartDate}
+            onPassengersChange={setSharedPassengers}
+          />
+        );
       case "multi":
         return <MultiCityForm />;
       default:

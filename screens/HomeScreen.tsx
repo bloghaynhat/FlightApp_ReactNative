@@ -1,23 +1,20 @@
 import React from "react";
 import { View, ScrollView, Image, StyleSheet } from "react-native";
-import Header from "../components/Header";
-import SearchBar from "../components/SearchBar";
-import SectionHeader from "../components/SectionHeader";
-import CityCard from "../components/CityCard";
-import { bestCities } from "../data/cities";
+import Header from "../components/Home/Header";
+import SectionHeader from "../components/Home/SectionHeader";
+import CityCard from "../components/Home/CityCard";
 
 const HomeScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <Header />
-      <SearchBar />
 
       <SectionHeader title="The best cities for you" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-        {bestCities.map((city) => (
+      {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+        {Array.from().map((city) => (
           <CityCard key={city.id} city={city} />
         ))}
-      </ScrollView>
+      </ScrollView> */}
 
       <SectionHeader title="Explore Destinations" />
       <Image

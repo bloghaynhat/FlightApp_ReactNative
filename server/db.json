@@ -1,18 +1,257 @@
 {
-  "flights": [
+  "airports": [
     {
-      "id": 1,
-      "from": "Hà Nội",
-      "to": "TP.HCM",
-      "price": 1200000,
-      "time": "2025-11-01T09:00:00"
+      "id": "SGN",
+      "name": "Sân bay Tân Sơn Nhất",
+      "code": "SGN",
+      "city": "Hồ Chí Minh",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Tan_Son_Nhat_International_Airport_%28SGN%29.jpg"
     },
     {
-      "id": 2,
-      "from": "Đà Nẵng",
-      "to": "Hà Nội",
-      "price": 950000,
-      "time": "2025-11-02T13:30:00"
+      "id": "HAN",
+      "name": "Sân bay Nội Bài",
+      "code": "HAN",
+      "city": "Hà Nội",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/05/Noi_Bai_International_Airport_Terminal_2.jpg"
+    },
+    {
+      "id": "DAD",
+      "name": "Sân bay Đà Nẵng",
+      "code": "DAD",
+      "city": "Đà Nẵng",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/23/Da_Nang_Airport_Terminal_2.jpg"
+    },
+    {
+      "id": "CXR",
+      "name": "Sân bay Cam Ranh",
+      "code": "CXR",
+      "city": "Nha Trang",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Cam_Ranh_International_Airport_terminal_2018.jpg"
+    },
+    {
+      "id": "PQC",
+      "name": "Sân bay Phú Quốc",
+      "code": "PQC",
+      "city": "Phú Quốc",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/4/41/Phu_Quoc_International_Airport_Terminal_2018.jpg"
+    },
+    {
+      "id": "HUI",
+      "name": "Sân bay Phú Bài",
+      "code": "HUI",
+      "city": "Huế",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Phu_Bai_International_Airport_Terminal_2.jpg"
+    },
+    {
+      "id": "VCA",
+      "name": "Sân bay Cần Thơ",
+      "code": "VCA",
+      "city": "Cần Thơ",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Can_Tho_Airport_Terminal.jpg"
+    },
+    {
+      "id": "HPH",
+      "name": "Sân bay Cát Bi",
+      "code": "HPH",
+      "city": "Hải Phòng",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Cat_Bi_Airport_Terminal.jpg"
+    },
+    {
+      "id": "VII",
+      "name": "Sân bay Vinh",
+      "code": "VII",
+      "city": "Nghệ An",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Vinh_Airport_Terminal.jpg"
+    },
+    {
+      "id": "THD",
+      "name": "Sân bay Thọ Xuân",
+      "code": "THD",
+      "city": "Thanh Hóa",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/97/Tho_Xuan_Airport_Terminal.jpg"
+    },
+    {
+      "id": "DLI",
+      "name": "Sân bay Liên Khương",
+      "code": "DLI",
+      "city": "Đà Lạt",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Lien_Khuong_Airport_Terminal.jpg"
+    },
+    {
+      "id": "TBB",
+      "name": "Sân bay Tuy Hòa",
+      "code": "TBB",
+      "city": "Phú Yên",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/84/Tuy_Hoa_Airport_Terminal.jpg"
+    },
+    {
+      "id": "VCS",
+      "name": "Sân bay Côn Đảo",
+      "code": "VCS",
+      "city": "Côn Đảo",
+      "country": "Vietnam",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Con_Dao_Airport.jpg"
     }
+  ],
+  "airlines": [
+    {
+      "id": "VN",
+      "name": "Vietnam Airlines",
+      "code": "VN",
+      "logo": "https://res.ivivu.com/flight/inbound/images/compact-logo/VietnamAirlines.webp"
+    },
+    {
+      "id": "VJ",
+      "name": "VietJet Air",
+      "code": "VJ",
+      "logo": "https://res.ivivu.com/flight/inbound/images/compact-logo/VietJetAir.webp"
+    }
+  ],
+  "flights": [
+    {
+      "id": "F001",
+      "flightNumber": "VN240",
+      "airlineId": "VN",
+      "fromAirportId": "SGN",
+      "toAirportId": "HAN",
+      "departureTime": "2025-12-10T08:00:00Z",
+      "arrivalTime": "2025-12-10T10:00:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F002",
+      "flightNumber": "VN241",
+      "airlineId": "VN",
+      "fromAirportId": "HAN",
+      "toAirportId": "SGN",
+      "departureTime": "2025-12-10T12:00:00Z",
+      "arrivalTime": "2025-12-10T14:15:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F003",
+      "flightNumber": "VJ170",
+      "airlineId": "VJ",
+      "fromAirportId": "SGN",
+      "toAirportId": "DAD",
+      "departureTime": "2025-12-10T15:30:00Z",
+      "arrivalTime": "2025-12-10T16:50:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F004",
+      "flightNumber": "VJ171",
+      "airlineId": "VJ",
+      "fromAirportId": "DAD",
+      "toAirportId": "SGN",
+      "departureTime": "2025-12-11T07:00:00Z",
+      "arrivalTime": "2025-12-11T08:20:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F005",
+      "flightNumber": "VN242",
+      "airlineId": "VN",
+      "fromAirportId": "SGN",
+      "toAirportId": "HAN",
+      "departureTime": "2025-12-10T14:00:00Z",
+      "arrivalTime": "2025-12-10T16:00:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F006",
+      "flightNumber": "VJ172",
+      "airlineId": "VJ",
+      "fromAirportId": "SGN",
+      "toAirportId": "HAN",
+      "departureTime": "2025-12-10T18:30:00Z",
+      "arrivalTime": "2025-12-10T20:30:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F007",
+      "flightNumber": "VN243",
+      "airlineId": "VN",
+      "fromAirportId": "HAN",
+      "toAirportId": "SGN",
+      "departureTime": "2025-12-10T16:00:00Z",
+      "arrivalTime": "2025-12-10T18:15:00Z",
+      "status": "Scheduled"
+    },
+    {
+      "id": "F008",
+      "flightNumber": "VJ173",
+      "airlineId": "VJ",
+      "fromAirportId": "HAN",
+      "toAirportId": "SGN",
+      "departureTime": "2025-12-12T20:00:00Z",
+      "arrivalTime": "2025-12-12T22:15:00Z",
+      "status": "Scheduled"
+    }
+  ],
+  "seatClasses": [
+    { "id": "SC01", "flightId": "F001", "className": "Economy", "price": 1500000, "totalSeats": 150 },
+    { "id": "SC02", "flightId": "F001", "className": "Business", "price": 3500000, "totalSeats": 20 },
+    { "id": "SC03", "flightId": "F003", "className": "Eco Saver", "price": 1200000, "totalSeats": 180 },
+    { "id": "SC04", "flightId": "F004", "className": "Eco Saver", "price": 1300000, "totalSeats": 180 },
+    { "id": "SC05", "flightId": "F002", "className": "Economy", "price": 1600000, "totalSeats": 150 },
+    { "id": "SC06", "flightId": "F002", "className": "Business", "price": 3600000, "totalSeats": 20 },
+    { "id": "SC07", "flightId": "F005", "className": "Economy", "price": 1550000, "totalSeats": 150 },
+    { "id": "SC08", "flightId": "F005", "className": "Business", "price": 3400000, "totalSeats": 20 },
+    { "id": "SC09", "flightId": "F006", "className": "Eco Saver", "price": 1400000, "totalSeats": 180 },
+    { "id": "SC10", "flightId": "F007", "className": "Economy", "price": 1650000, "totalSeats": 150 },
+    { "id": "SC11", "flightId": "F007", "className": "Business", "price": 3700000, "totalSeats": 20 },
+    { "id": "SC12", "flightId": "F008", "className": "Eco Saver", "price": 1450000, "totalSeats": 180 }
+  ],
+  "bookingOrders": [
+    {
+      "id": "BO01",
+      "confirmationCode": "ABCDEF",
+      "totalPrice": 5400000,
+      "bookingDate": "2025-11-04T10:00:00Z",
+      "emailContact": "an.nguyen@email.com",
+      "phoneContact": "0901112222",
+      "paymentMethod": "CreditCard",
+      "status": "Confirmed"
+    },
+    {
+      "id": "BO02",
+      "confirmationCode": "GHIJKL",
+      "totalPrice": 2600000,
+      "bookingDate": "2025-11-04T10:30:00Z",
+      "emailContact": "van.tran@email.com",
+      "phoneContact": "0903334444",
+      "paymentMethod": "BankTransfer",
+      "status": "Confirmed"
+    }
+  ],
+  "bookingSegments": [
+    { "id": "BS01", "bookingOrderId": "BO01", "seatClassId": "SC01", "numSeats": 2, "status": "Confirmed" },
+    { "id": "BS02", "bookingOrderId": "BO01", "seatClassId": "SC02", "numSeats": 1, "status": "Confirmed" },
+    { "id": "BS03", "bookingOrderId": "BO02", "seatClassId": "SC03", "numSeats": 2, "status": "Confirmed" }
+  ],
+  "passengers": [
+    { "id": "P001", "firstName": "Anh", "lastName": "Nguyễn Văn", "birthDate": "1990-05-15" },
+    { "id": "P002", "firstName": "Bình", "lastName": "Trần Thị", "birthDate": "1995-08-20" },
+    { "id": "P003", "firstName": "Cường", "lastName": "Lê", "birthDate": "2000-11-01" }
+  ],
+  "bookingPassengers": [
+    { "id": "BP01", "bookingSegmentId": "BS01", "passengerId": "P001", "seatNumber": "15A" },
+    { "id": "BP02", "bookingSegmentId": "BS01", "passengerId": "P002", "seatNumber": "15B" },
+    { "id": "BP03", "bookingSegmentId": "BS02", "passengerId": "P003", "seatNumber": "1D" },
+    { "id": "BP04", "bookingSegmentId": "BS03", "passengerId": "P001", "seatNumber": "10C" },
+    { "id": "BP05", "bookingSegmentId": "BS03", "passengerId": "P002", "seatNumber": "10D" }
   ]
 }

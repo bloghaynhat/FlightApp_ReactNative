@@ -1,39 +1,60 @@
 import React from "react";
 import { View, TextInput, StyleSheet, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
-import type { City } from "../../types/City";
+import { useNavigation } from "@react-navigation/native";
+import type { Airport } from "../../types";
 import { LocationInput } from "./LocationInput";
 import DateRangePicker from "./DateRangePicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+interface RoundTripFormProps {
+  fromCity: Airport | null;
+  toCity: Airport | null;
+  departDate: Date | null;
+  returnDate: Date | null;
+  passengers: number;
+  onFromCityChange: (city: Airport | null) => void;
+  onToCityChange: (city: Airport | null) => void;
+  onDepartDateChange: (date: Date | null) => void;
+  onReturnDateChange: (date: Date | null) => void;
+  onPassengersChange: (count: number) => void;
+}
 
-const RoundTripForm = () => {
-  const [fromCity, setFromCity] = useState<City | null>(null);
-  const [toCity, setToCity] = useState<City | null>(null);
-  const [departDate, setDepartDate] = useState<Date | null>(null);
-  const [returnDate, setReturnDate] = useState<Date | null>(null);
-  const [passengers, setPassengers] = useState<number>(1);
+const RoundTripForm: React.FC<RoundTripFormProps> = ({
+  fromCity,
+  toCity,
+  departDate,
+  returnDate,
+  passengers,
+  onFromCityChange,
+  onToCityChange,
+  onDepartDateChange,
+  onReturnDateChange,
+  onPassengersChange,
+}) => {
+  const navigation = useNavigation<any>();
 
   const handleSwapCities = () => {
     const temp = fromCity;
-    setFromCity(toCity);
-    setToCity(temp);
+    onFromCityChange(toCity);
+    onToCityChange(temp);
   };
 
   const handleSearch = () => {
-    if (fromCity && toCity && departDate) {
-      console.log({
-        from: fromCity,
-        to: toCity,
-        departDate,
-        returnDate,
+    if (fromCity && toCity && departDate && returnDate) {
+      // Navigate to search results
+      navigation.navigate("SearchResult", {
+        fromAirportId: fromCity.id,
+        toAirportId: toCity.id,
+        departDate: departDate.toISOString().split("T")[0],
+        returnDate: returnDate.toISOString().split("T")[0],
         passengers,
+        tripType: "roundTrip",
       });
-      // Navigate to search results or perform search
     }
   };
 
-  const isFormValid = fromCity && toCity && departDate;
+  const isFormValid = fromCity && toCity && departDate && returnDate;
 
   return (
     <ScrollView style={styles.container}>
@@ -43,19 +64,30 @@ const RoundTripForm = () => {
 
       <View style={styles.formContainer}>
         <View style={styles.locationContainer}>
-        {/* From Location */}
-        <LocationInput label="Từ" placeholder="Chọn thành phố khởi hành" value={fromCity} onSelect={setFromCity} />
+          {/* From Location */}
+          <LocationInput
+            label="Từ"
+            placeholder="Chọn thành phố khởi hành"
+            value={fromCity}
+            onSelect={onFromCityChange}
+            iconName=""
+          />
 
-        {/* Swap Button */}
-        <TouchableOpacity style={styles.swapButton} onPress={handleSwapCities}>
-          <Ionicons name="swap-vertical" size={22} color="#333" />
-        </TouchableOpacity>
+          {/* Swap Button */}
+          <TouchableOpacity style={styles.swapButton} onPress={handleSwapCities}>
+            <Ionicons name="swap-vertical" size={22} color="#333" />
+          </TouchableOpacity>
 
-        {/* To Location */}
-        <LocationInput label="Đến" placeholder="Chọn thành phố đến" value={toCity} onSelect={setToCity} />
-
+          {/* To Location */}
+          <LocationInput
+            label="Đến"
+            placeholder="Chọn thành phố đến"
+            value={toCity}
+            onSelect={onToCityChange}
+            iconName=""
+          />
         </View>
-        
+
         {/* Divider */}
         <View style={styles.divider} />
 
@@ -63,9 +95,10 @@ const RoundTripForm = () => {
           startDate={departDate}
           endDate={returnDate}
           onSelect={(start, end) => {
-            setDepartDate(start);
-            setReturnDate(end);
+            onDepartDateChange(start);
+            onReturnDateChange(end);
           }}
+          mode="range"
         />
 
         {/* Divider */}
@@ -79,14 +112,14 @@ const RoundTripForm = () => {
               <View style={styles.passengerCounter}>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => setPassengers(Math.max(1, passengers - 1))}
+                  onPress={() => onPassengersChange(Math.max(1, passengers - 1))}
                 >
                   <Ionicons name="remove" size={20} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.passengerValue}>{passengers}</Text>
                 <TouchableOpacity
                   style={styles.counterButton}
-                  onPress={() => setPassengers(Math.min(9, passengers + 1))}
+                  onPress={() => onPassengersChange(Math.min(9, passengers + 1))}
                 >
                   <Ionicons name="add" size={20} color="#333" />
                 </TouchableOpacity>
@@ -130,21 +163,21 @@ const styles = StyleSheet.create({
   },
   locationContainer: {
     position: "relative",
-    height: "auto"
+    height: "auto",
   },
   swapButton: {
-  width: 44,
-  height: 44,
-  borderRadius: 22,
-  backgroundColor: "#f0f0f0",
-  justifyContent: "center",
-  alignItems: "center",
-  position: "absolute",
-  right: 16,
-  top: "50%",
-  transform: [{ translateY: -22 }], // -1/2 chiều cao của nút
-  zIndex: 10, // ✅ nổi lên trên các phần tử khác
-},
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    right: 16,
+    top: "50%",
+    transform: [{ translateY: -22 }], // -1/2 chiều cao của nút
+    zIndex: 10, // ✅ nổi lên trên các phần tử khác
+  },
   divider: {
     height: 1,
     backgroundColor: "#eee",
