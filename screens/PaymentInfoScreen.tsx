@@ -89,7 +89,7 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
 
                 {/* Total Amount Section - Gradient Background */}
                 <LinearGradient
-                    colors={["#0066cc", "#0066cc"]}
+                    colors={["#0070BB", "#0070BB"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.totalAmountCard}
@@ -148,7 +148,7 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
                 </CollapsibleCard>
 
                 <LinearGradient
-                    colors={["#0066cc", "#0066cc"]}
+                    colors={["#0070BB", "#0070BB"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.payButtonGradient}
