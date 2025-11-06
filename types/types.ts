@@ -41,6 +41,6 @@ export type RootStackParamList = {
     tripType?: "oneWay" | "roundTrip";
   } | undefined; // allow undefined when navigated directly
   PaymentMethod: { bookingPayload?: any } | undefined;
-  BookingConfirmation: { booking: any; segments?: any[] } | undefined;
+  BookingConfirmation: { booking: any; segments?: any[]; bookingPassengers?: any[]; passengers?: any[] } | undefined;
   SearchFlight: undefined;
 };

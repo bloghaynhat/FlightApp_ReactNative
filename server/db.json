@@ -337,6 +337,16 @@
       "phoneContact": "0914462297",
       "paymentMethod": "momo",
       "status": "Confirmed"
+    },
+    {
+      "id": "BO1762442535059",
+      "confirmationCode": "C85RKM",
+      "totalPrice": 7400000,
+      "bookingDate": "2025-11-06T15:22:15.059Z",
+      "emailContact": "nhantnpt2609@gmail.com",
+      "phoneContact": "0914462297",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
     }
   ],
   "bookingSegments": [
@@ -380,6 +390,22 @@
       "bookingOrderId": "BO1762438090630",
       "seatClassId": "SC10",
       "numSeats": 2,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS1762442535082_OUT_0",
+      "bookingOrderId": "BO1762442535059",
+      "passengerName": "Huynh Trong Nhan",
+      "seatClassId": "SC11",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS1762442535082_OUT_1",
+      "bookingOrderId": "BO1762442535059",
+      "passengerName": "Huynh Trong Thuy",
+      "seatClassId": "SC11",
+      "numSeats": 1,
       "status": "Confirmed"
     }
   ],
@@ -433,6 +459,20 @@
       "bookingSegmentId": "BS03",
       "passengerId": "P002",
       "seatNumber": "10D"
+    },
+    {
+      "id": "BP1762442535214_0",
+      "bookingSegmentId": "BS1762442535082_OUT_0",
+      "passengerFirst": "Nhan",
+      "passengerLast": "Huynh Trong",
+      "seatNumber": null
+    },
+    {
+      "id": "BP1762442535227_1",
+      "bookingSegmentId": "BS1762442535082_OUT_1",
+      "passengerFirst": "Thuy",
+      "passengerLast": "Huynh Trong",
+      "seatNumber": null
     }
   ]
 }

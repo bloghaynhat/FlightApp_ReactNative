@@ -7,7 +7,7 @@ import PaymentHeader from "../components/Payment/PaymentHeader"
 import { useState, useRef } from "react"
 
 type RootStackParamList = {
-    BookingConfirmation: { booking: any; segments?: any[] }
+    BookingConfirmation: { booking: any; segments?: any[]; bookingPassengers?: any[] }
 }
 
 type BookingConfirmationRouteProp = RouteProp<RootStackParamList, "BookingConfirmation">
@@ -15,7 +15,7 @@ type BookingConfirmationRouteProp = RouteProp<RootStackParamList, "BookingConfir
 const BookingConfirmation: React.FC = () => {
     const route = useRoute<BookingConfirmationRouteProp>()
     const navigation = useNavigation()
-    const { booking, segments } = route.params
+    const { booking, segments, bookingPassengers } = route.params
 
     const [isAnimating, setIsAnimating] = useState(false)
     const planePosition = useRef(new Animated.Value(-100)).current
@@ -118,6 +118,21 @@ const BookingConfirmation: React.FC = () => {
                                         <Text style={styles.detailLabel}>Hạng ghế:</Text>
                                         <Text style={styles.detailValue}>{segment.seatClassId}</Text>
                                     </View>
+                                    {bookingPassengers && bookingPassengers.length > 0 ? (
+                                        (bookingPassengers.filter((bp: any) => bp.bookingSegmentId === segment.id) || []).map((bp: any) => (
+                                            <View key={bp.id} style={styles.detailRow}>
+                                                <Text style={styles.detailLabel}>Hành khách:</Text>
+                                                <Text style={styles.detailValue}>{`${bp.passengerLast ?? ""} ${bp.passengerFirst ?? ""}`.trim() || "-"}</Text>
+                                            </View>
+                                        ))
+                                    ) : (
+                                        segment.passengerName && (
+                                            <View style={styles.detailRow}>
+                                                <Text style={styles.detailLabel}>Hành khách:</Text>
+                                                <Text style={styles.detailValue}>{segment.passengerName}</Text>
+                                            </View>
+                                        )
+                                    )}
                                     <View style={styles.detailRow}>
                                         <Text style={styles.detailLabel}>Số ghế:</Text>
                                         <Text style={styles.detailValue}>{segment.numSeats}</Text>
