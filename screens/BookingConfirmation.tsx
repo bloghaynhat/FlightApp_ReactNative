@@ -4,10 +4,12 @@ import { type RouteProp, useRoute, useNavigation } from "@react-navigation/nativ
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
 import PaymentHeader from "../components/Payment/PaymentHeader"
-import { useState, useRef } from "react"
+import Ticket from "../components/Payment/Ticket"
+import { useState, useRef, useEffect } from "react"
+import apiClient from "../apis/apiClient"
 
 type RootStackParamList = {
-    BookingConfirmation: { booking: any; segments?: any[] }
+    BookingConfirmation: { booking: any; segments?: any[]; bookingPassengers?: any[]; passengers?: any[] }
 }
 
 type BookingConfirmationRouteProp = RouteProp<RootStackParamList, "BookingConfirmation">
@@ -15,7 +17,7 @@ type BookingConfirmationRouteProp = RouteProp<RootStackParamList, "BookingConfir
 const BookingConfirmation: React.FC = () => {
     const route = useRoute<BookingConfirmationRouteProp>()
     const navigation = useNavigation()
-    const { booking, segments } = route.params
+    const { booking, segments, bookingPassengers, passengers } = route.params
 
     const [isAnimating, setIsAnimating] = useState(false)
     const planePosition = useRef(new Animated.Value(-100)).current
@@ -30,6 +32,60 @@ const BookingConfirmation: React.FC = () => {
             navigation.navigate("MainTabs" as any, { screen: "Home" })
         })
     }
+
+    const [flightsMap, setFlightsMap] = useState<Record<string, any>>({})
+    const [seatClassMap, setSeatClassMap] = useState<Record<string, any>>({})
+    const [airportsMap, setAirportsMap] = useState<Record<string, any>>({})
+
+    useEffect(() => {
+        if (!segments || segments.length === 0) return
+
+        const load = async () => {
+            try {
+                const seatClassIds = Array.from(new Set(segments.map((s: any) => s.seatClassId).filter(Boolean)))
+                const flightIdsFromSegments = Array.from(new Set(segments.map((s: any) => s.flightId).filter(Boolean)))
+
+                const seatClassPromises = seatClassIds.map((id: string) => apiClient.get(`/seatClasses/${id}`).then(r => r.data).catch(() => null))
+                const seatClasses = await Promise.all(seatClassPromises)
+                const seatClassMapLocal: Record<string, any> = {}
+                const extraFlightIds: string[] = []
+                seatClasses.forEach((sc: any) => {
+                    if (!sc) return
+                    seatClassMapLocal[sc.id] = sc
+                    if (sc.flightId) extraFlightIds.push(sc.flightId)
+                })
+
+                const flightIds = Array.from(new Set([...flightIdsFromSegments, ...extraFlightIds]))
+                const flightPromises = flightIds.map((id: string) => apiClient.get(`/flights/${id}`).then(r => r.data).catch(() => null))
+                const flights = await Promise.all(flightPromises)
+                const flightsMapLocal: Record<string, any> = {}
+                const airportIds: string[] = []
+                flights.forEach((f: any) => {
+                    if (!f) return
+                    flightsMapLocal[f.id] = f
+                    if (f.fromAirportId) airportIds.push(f.fromAirportId)
+                    if (f.toAirportId) airportIds.push(f.toAirportId)
+                })
+
+                const uniqueAirportIds = Array.from(new Set(airportIds))
+                const airportPromises = uniqueAirportIds.map((id: string) => apiClient.get(`/airports/${id}`).then(r => r.data).catch(() => null))
+                const airports = await Promise.all(airportPromises)
+                const airportsMapLocal: Record<string, any> = {}
+                airports.forEach((a: any) => {
+                    if (!a) return
+                    airportsMapLocal[a.id] = a
+                })
+
+                setSeatClassMap(seatClassMapLocal)
+                setFlightsMap(flightsMapLocal)
+                setAirportsMap(airportsMapLocal)
+            } catch (err) {
+                console.warn('Failed to load flight/seat/airport data', err)
+            }
+        }
+
+        load()
+    }, [segments])
 
     return (
         <>
@@ -116,8 +172,56 @@ const BookingConfirmation: React.FC = () => {
                                 <View style={styles.segmentDetails}>
                                     <View style={styles.detailRow}>
                                         <Text style={styles.detailLabel}>Hạng ghế:</Text>
-                                        <Text style={styles.detailValue}>{segment.seatClassId}</Text>
+                                        <Text style={styles.detailValue}>{seatClassMap[segment.seatClassId]?.className ?? segment.seatClassId}</Text>
                                     </View>
+                                    {/* Departure / Arrival times and cities (if we have flight data) */}
+                                    {(() => {
+                                        const flight = flightsMap[segment.flightId] ?? (seatClassMap[segment.seatClassId] && flightsMap[seatClassMap[segment.seatClassId].flightId])
+                                        if (!flight) return null
+                                        const fromAirport = airportsMap[flight.fromAirportId]
+                                        const toAirport = airportsMap[flight.toAirportId]
+                                        return (
+                                            <>
+                                                <View style={styles.detailRow}>
+                                                    <Text style={styles.detailLabel}>Khởi hành:</Text>
+                                                    <Text style={styles.detailValue}>{new Date(flight.departureTime).toLocaleString()}</Text>
+                                                </View>
+                                                <View style={styles.detailRow}>
+                                                    <Text style={styles.detailLabel}>Đến nơi:</Text>
+                                                    <Text style={styles.detailValue}>{new Date(flight.arrivalTime).toLocaleString()}</Text>
+                                                </View>
+                                                <View style={styles.detailRow}>
+                                                    <Text style={styles.detailLabel}>Từ:</Text>
+                                                    <Text style={styles.detailValue}>{fromAirport?.city ?? fromAirport?.name ?? flight.fromAirportId}</Text>
+                                                </View>
+                                                <View style={styles.detailRow}>
+                                                    <Text style={styles.detailLabel}>Đến:</Text>
+                                                    <Text style={styles.detailValue}>{toAirport?.city ?? toAirport?.name ?? flight.toAirportId}</Text>
+                                                </View>
+                                            </>
+                                        )
+                                    })()}
+                                    {bookingPassengers && bookingPassengers.length > 0 ? (
+                                        (bookingPassengers.filter((bp: any) => bp.bookingSegmentId === segment.id) || []).map((bp: any) => {
+                                            const passenger = passengers?.find((p: any) => p.id === bp.passengerId)
+                                            const name = passenger
+                                                ? `${passenger.lastName ?? ""} ${passenger.firstName ?? ""}`.trim()
+                                                : `${bp.passengerLast ?? ""} ${bp.passengerFirst ?? ""}`.trim()
+                                            return (
+                                                <View key={bp.id} style={styles.detailRow}>
+                                                    <Text style={styles.detailLabel}>Hành khách:</Text>
+                                                    <Text style={styles.detailValue}>{name || "-"}</Text>
+                                                </View>
+                                            )
+                                        })
+                                    ) : (
+                                        segment.passengerName && (
+                                            <View style={styles.detailRow}>
+                                                <Text style={styles.detailLabel}>Hành khách:</Text>
+                                                <Text style={styles.detailValue}>{segment.passengerName}</Text>
+                                            </View>
+                                        )
+                                    )}
                                     <View style={styles.detailRow}>
                                         <Text style={styles.detailLabel}>Số ghế:</Text>
                                         <Text style={styles.detailValue}>{segment.numSeats}</Text>
@@ -131,6 +235,50 @@ const BookingConfirmation: React.FC = () => {
                                 </View>
                             </View>
                         ))}
+                    </View>
+                )}
+
+                {/* Tickets: render one Ticket per passenger × segment */}
+                {segments && segments.length > 0 && bookingPassengers && bookingPassengers.length > 0 && (
+                    <View style={[styles.segmentsSection, { marginTop: 8 }]}>
+                        <Text style={styles.sectionTitle}>Vé của bạn</Text>
+                        {segments.flatMap((segment: any) => {
+                            const bps = (bookingPassengers || []).filter((bp: any) => bp.bookingSegmentId === segment.id)
+                            return bps.map((bp: any, bpIndex: number) => {
+                                const passenger = passengers?.find((p: any) => String(p.id) === String(bp.passengerId))
+                                const passengerName = passenger ? `${passenger.lastName ?? ''} ${passenger.firstName ?? ''}`.trim() : `${bp.passengerLast ?? ''} ${bp.passengerFirst ?? ''}`.trim()
+                                // derive from/to codes if present on booking or segment
+                                // prefer flight/airport/seatClass maps loaded from server
+                                const flight = flightsMap[segment.flightId] ?? (seatClassMap[segment.seatClassId] && flightsMap[seatClassMap[segment.seatClassId].flightId])
+                                const fromAirport = flight ? airportsMap[flight.fromAirportId] : undefined
+                                const toAirport = flight ? airportsMap[flight.toAirportId] : undefined
+                                const fromCode = fromAirport?.code ?? segment.fromCode ?? booking.fromCode ?? ''
+                                const toCode = toAirport?.code ?? segment.toCode ?? booking.toCode ?? ''
+                                const flightNumber = flight?.flightNumber ?? segment.flightNumber ?? segment.flightId ?? ''
+                                const date = flight?.departureTime ?? booking.bookingDate ?? booking.date ?? ''
+                                const time = flight?.departureTime ? new Date(flight.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (segment.time ?? '')
+                                const seat = bp.seatNumber ?? segment.seatNumber ?? ''
+                                const bookingCode = bp.id ?? ''
+                                const seatClass = seatClassMap[segment.seatClassId]?.className ?? segment.seatClassId ?? ''
+
+                                return (
+                                    <Ticket
+                                        key={`${segment.id}_${bp.id ?? bpIndex}`}
+                                        fromCode={fromCode || '---'}
+                                        fromName={fromAirport?.city ?? segment.fromName ?? booking.fromName}
+                                        toCode={toCode || '---'}
+                                        toName={toAirport?.city ?? segment.toName ?? booking.toName}
+                                        passengerName={passengerName || '-'}
+                                        flightNumber={flightNumber}
+                                        date={date}
+                                        time={time}
+                                        seat={seat}
+                                        bookingCode={String(bookingCode)}
+                                        seatClass={seatClass}
+                                    />
+                                )
+                            })
+                        })}
                     </View>
                 )}
 

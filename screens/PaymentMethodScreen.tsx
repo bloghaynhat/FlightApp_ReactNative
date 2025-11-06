@@ -73,37 +73,104 @@ const PaymentMethodScreen: React.FC = () => {
 
       if (resp.status === 201) {
         const created = resp.data
-        const segments = [] as any[]
-        if (bookingPayload?.selectedSeatClassId) {
-          segments.push({
-            id: `BS${Date.now()}1`,
-            bookingOrderId: created.id,
-            seatClassId: bookingPayload.selectedSeatClassId,
-            numSeats: Array.isArray(bookingPayload.passengers)
-              ? bookingPayload.passengers.length
-              : bookingPayload.passengers || 1,
-            status: "Confirmed",
-          })
-        }
-        if (bookingPayload?.selectedReturnSeatClassId) {
-          segments.push({
-            id: `BS${Date.now()}2`,
-            bookingOrderId: created.id,
-            seatClassId: bookingPayload.selectedReturnSeatClassId,
-            numSeats: Array.isArray(bookingPayload.passengers)
-              ? bookingPayload.passengers.length
-              : bookingPayload.passengers || 1,
-            status: "Confirmed",
-          })
+
+        // Normalize passengers into an array of passenger objects (or placeholders)
+        const passengersArray = Array.isArray(bookingPayload?.passengers)
+          ? bookingPayload.passengers
+          : Array.from({ length: bookingPayload?.passengers || 1 }).map((_, i) => ({ firstName: `Passenger${i + 1}` }))
+
+        // --- AVAILABILITY CHECK ---
+        const checkSeatAvailability = async (seatClassId: string, neededSeats: number) => {
+          try {
+            const scResp = await apiClient.get(`/seatClasses/${seatClassId}`)
+            const seatClass = scResp.data
+            if (!seatClass) return { ok: false, available: 0 }
+            const segResp = await apiClient.get(`/bookingSegments?seatClassId=${seatClassId}`)
+            const existingSegments = Array.isArray(segResp.data) ? segResp.data : []
+            const reserved = existingSegments.reduce((sum: number, s: any) => sum + (s.numSeats || 0), 0)
+            const available = (seatClass.totalSeats || 0) - reserved
+            return { ok: available >= neededSeats, available }
+          } catch (err) {
+            console.warn('Seat availability check failed', err)
+            return { ok: true, available: Infinity }
+          }
         }
 
-        const createdSegments: any[] = []
-        for (const seg of segments) {
-          const segResp = await apiClient.post("/bookingSegments", seg)
-          if (segResp.status === 201) createdSegments.push(segResp.data)
+        const needed = passengersArray.length
+        if (bookingPayload?.selectedSeatClassId) {
+          const result = await checkSeatAvailability(bookingPayload.selectedSeatClassId, needed)
+          if (!result.ok) {
+            setLoading(false)
+            Alert.alert('Không đủ ghế', `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedSeatClassId}. Vui lòng chọn hạng khác hoặc giảm số hành khách.`)
+            return
+          }
         }
+        if (bookingPayload?.selectedReturnSeatClassId) {
+          const result = await checkSeatAvailability(bookingPayload.selectedReturnSeatClassId, needed)
+          if (!result.ok) {
+            setLoading(false)
+            Alert.alert('Không đủ ghế', `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedReturnSeatClassId} (chiều về). Vui lòng chọn hạng khác hoặc giảm số hành khách.`)
+            return
+          }
+        }
+
+        // Create bookingSegments per leg (one segment per leg, numSeats = passengerCount)
+        const segmentsCreated: any[] = []
+        const outboundFlightId = bookingPayload?.outboundFlight?.id ?? bookingPayload?.flight?.id
+        const returnFlightId = bookingPayload?.returnFlight?.id
+
+        if (bookingPayload?.selectedSeatClassId) {
+          const segBody: any = {
+            bookingOrderId: created.id,
+            flightId: outboundFlightId,
+            leg: 'outbound',
+            seatClassId: bookingPayload.selectedSeatClassId,
+            numSeats: needed,
+            status: 'Confirmed',
+          }
+          const segResp = await apiClient.post('/bookingSegments', segBody)
+          if (segResp.status === 201) segmentsCreated.push(segResp.data)
+        }
+
+        if (bookingPayload?.selectedReturnSeatClassId && returnFlightId) {
+          const segBody: any = {
+            bookingOrderId: created.id,
+            flightId: returnFlightId,
+            leg: 'return',
+            seatClassId: bookingPayload.selectedReturnSeatClassId,
+            numSeats: needed,
+            status: 'Confirmed',
+          }
+          const segResp = await apiClient.post('/bookingSegments', segBody)
+          if (segResp.status === 201) segmentsCreated.push(segResp.data)
+        }
+
+        // Create normalized passengers (POST /passengers if missing) and collect their ids
+        const createdPassengers: any[] = []
+        for (let i = 0; i < passengersArray.length; i++) {
+          const p = passengersArray[i]
+          if (p?.id) {
+            createdPassengers.push(p)
+            continue
+          }
+          const pBody = { firstName: p.firstName ?? '', lastName: p.lastName ?? '', birthDate: p.birthDate ?? null }
+          const pResp = await apiClient.post('/passengers', pBody)
+          if (pResp.status === 201) createdPassengers.push(pResp.data)
+        }
+
+        // Create bookingPassengers mapping entries for each segment × passenger
+        const createdBookingPassengers: any[] = []
+        for (const seg of segmentsCreated) {
+          for (let i = 0; i < createdPassengers.length; i++) {
+            const p = createdPassengers[i]
+            const bpBody = { bookingSegmentId: seg.id, passengerId: p.id, seatNumber: null }
+            const bpResp = await apiClient.post('/bookingPassengers', bpBody)
+            if (bpResp.status === 201) createdBookingPassengers.push(bpResp.data)
+          }
+        }
+
         setLoading(false)
-        navigation.navigate("BookingConfirmation", { booking: created, segments: createdSegments })
+        navigation.navigate('BookingConfirmation', { booking: created, segments: segmentsCreated, bookingPassengers: createdBookingPassengers, passengers: createdPassengers })
         return
       }
       setLoading(false)
