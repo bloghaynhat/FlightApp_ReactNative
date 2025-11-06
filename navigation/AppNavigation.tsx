@@ -9,7 +9,9 @@ import PassengerInfoScreen from "../screens/PassengerInfoScreen";
 import ReturnFlightSelectionScreen from "../screens/ReturnFlightSelectionScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
-import PaymentInfoScreen from "../screens/PaymentInfoScreen ";
+import PaymentMethodScreen from "../screens/PaymentMethodScreen";
+import QRCodeScreen from "../screens/QRCodeScreen";
+import PaymentInfoScreen from "../screens/PaymentInfoScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -22,8 +24,10 @@ const ProfileScreen = () => (
 
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="HomeMain" component={PaymentInfoScreen} />
-    <Stack.Screen name="SearchFlight" component={SearchFlightScreen} />
+    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="PassengerInfo" component={PassengerInfoScreen} />
+    <Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />
+    <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen} />
   </Stack.Navigator>
 );
 
@@ -61,7 +65,7 @@ const AppNavigator = () => (
       <Stack.Screen name="MainTabs" component={BottomTabs} />
       <Stack.Screen name="SearchResult" component={SearchResultScreen} />
       <Stack.Screen name="ReturnFlightSelection" component={ReturnFlightSelectionScreen} />
-      <Stack.Screen name="PassengerInfo" component={PassengerInfoScreen} />
+      <Stack.Screen name="BookingConfirmation" component={require('../screens/BookingConfirmation').default} />
     </Stack.Navigator>
   </NavigationContainer>
 );

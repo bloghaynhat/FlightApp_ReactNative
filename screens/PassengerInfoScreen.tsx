@@ -6,34 +6,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import type { FlightResult } from "../apis/flightService";
 import type { Airport } from "../types";
-
-type RootStackParamList = {
-  PassengerInfo: {
-    flight?: FlightResult; // For oneWay
-    outboundFlight?: FlightResult; // For roundTrip
-    returnFlight?: FlightResult; // For roundTrip
-    fromAirport: Airport;
-    toAirport: Airport;
-    departDate: string;
-    returnDate?: string;
-    passengers: number;
-    tripType: "oneWay" | "roundTrip";
-  };
-};
+import type { RootStackParamList, PassengerData, ContactData } from "../types/types";
 
 type PassengerInfoScreenRouteProp = RouteProp<RootStackParamList, "PassengerInfo">;
 type PassengerInfoScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "PassengerInfo">;
 
-interface PassengerData {
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-}
-
-interface ContactData {
-  email: string;
-  phone: string;
-}
+// Use shared types
+// PassengerData and ContactData are defined in ../types/types
 
 const PassengerInfoScreen: React.FC = () => {
   const route = useRoute<PassengerInfoScreenRouteProp>();
@@ -109,16 +88,21 @@ const PassengerInfoScreen: React.FC = () => {
       return;
     }
 
-    // TODO: Navigate to payment screen
-    console.log("Passenger Info:", {
+    // Now PassengerInfo is in the same HomeStack as PaymentInfo,
+    // so we can navigate directly by route name and pass params.
+    navigation.navigate("PaymentInfo", {
+      flight,
       passengers: passengerList,
       contact,
       selectedSeatClassId,
-      flight,
-    });
-
-    Alert.alert("Thành công", "Thông tin đã được lưu. Tiếp tục đến thanh toán...");
+      returnFlight,
+      selectedReturnSeatClassId,
+      departDate,
+      returnDate,
+      tripType,
+    } as any);
   };
+
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {

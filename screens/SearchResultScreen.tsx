@@ -72,13 +72,21 @@ const SearchResultScreen: React.FC = () => {
   const handleFlightPress = (flight: FlightResult) => {
     // Navigate to passenger info for OneWay
     if (tripType === "oneWay") {
-      (navigation as any).navigate("PassengerInfo", {
-        flight,
-        fromAirport,
-        toAirport,
-        departDate,
-        passengers,
-        tripType,
+      // PassengerInfo now lives inside the HomeStack (MainTabs -> Home)
+      // Navigate to the nested route so the screen is found
+      (navigation as any).navigate("MainTabs", {
+        screen: "Home",
+        params: {
+          screen: "PassengerInfo",
+          params: {
+            flight,
+            fromAirport,
+            toAirport,
+            departDate,
+            passengers,
+            tripType,
+          },
+        },
       });
     } else {
       // For RoundTrip: Navigate to return flight selection

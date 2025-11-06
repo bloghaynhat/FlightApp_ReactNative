@@ -202,18 +202,90 @@
     }
   ],
   "seatClasses": [
-    { "id": "SC01", "flightId": "F001", "className": "Economy", "price": 1500000, "totalSeats": 150 },
-    { "id": "SC02", "flightId": "F001", "className": "Business", "price": 3500000, "totalSeats": 20 },
-    { "id": "SC03", "flightId": "F003", "className": "Eco Saver", "price": 1200000, "totalSeats": 180 },
-    { "id": "SC04", "flightId": "F004", "className": "Eco Saver", "price": 1300000, "totalSeats": 180 },
-    { "id": "SC05", "flightId": "F002", "className": "Economy", "price": 1600000, "totalSeats": 150 },
-    { "id": "SC06", "flightId": "F002", "className": "Business", "price": 3600000, "totalSeats": 20 },
-    { "id": "SC07", "flightId": "F005", "className": "Economy", "price": 1550000, "totalSeats": 150 },
-    { "id": "SC08", "flightId": "F005", "className": "Business", "price": 3400000, "totalSeats": 20 },
-    { "id": "SC09", "flightId": "F006", "className": "Eco Saver", "price": 1400000, "totalSeats": 180 },
-    { "id": "SC10", "flightId": "F007", "className": "Economy", "price": 1650000, "totalSeats": 150 },
-    { "id": "SC11", "flightId": "F007", "className": "Business", "price": 3700000, "totalSeats": 20 },
-    { "id": "SC12", "flightId": "F008", "className": "Eco Saver", "price": 1450000, "totalSeats": 180 }
+    {
+      "id": "SC01",
+      "flightId": "F001",
+      "className": "Economy",
+      "price": 1500000,
+      "totalSeats": 150
+    },
+    {
+      "id": "SC02",
+      "flightId": "F001",
+      "className": "Business",
+      "price": 3500000,
+      "totalSeats": 20
+    },
+    {
+      "id": "SC03",
+      "flightId": "F003",
+      "className": "Eco Saver",
+      "price": 1200000,
+      "totalSeats": 180
+    },
+    {
+      "id": "SC04",
+      "flightId": "F004",
+      "className": "Eco Saver",
+      "price": 1300000,
+      "totalSeats": 180
+    },
+    {
+      "id": "SC05",
+      "flightId": "F002",
+      "className": "Economy",
+      "price": 1600000,
+      "totalSeats": 150
+    },
+    {
+      "id": "SC06",
+      "flightId": "F002",
+      "className": "Business",
+      "price": 3600000,
+      "totalSeats": 20
+    },
+    {
+      "id": "SC07",
+      "flightId": "F005",
+      "className": "Economy",
+      "price": 1550000,
+      "totalSeats": 150
+    },
+    {
+      "id": "SC08",
+      "flightId": "F005",
+      "className": "Business",
+      "price": 3400000,
+      "totalSeats": 20
+    },
+    {
+      "id": "SC09",
+      "flightId": "F006",
+      "className": "Eco Saver",
+      "price": 1400000,
+      "totalSeats": 180
+    },
+    {
+      "id": "SC10",
+      "flightId": "F007",
+      "className": "Economy",
+      "price": 1650000,
+      "totalSeats": 150
+    },
+    {
+      "id": "SC11",
+      "flightId": "F007",
+      "className": "Business",
+      "price": 3700000,
+      "totalSeats": 20
+    },
+    {
+      "id": "SC12",
+      "flightId": "F008",
+      "className": "Eco Saver",
+      "price": 1450000,
+      "totalSeats": 180
+    }
   ],
   "bookingOrders": [
     {
@@ -235,23 +307,132 @@
       "phoneContact": "0903334444",
       "paymentMethod": "BankTransfer",
       "status": "Confirmed"
+    },
+    {
+      "id": "BO1762435319812",
+      "confirmationCode": "0HWMA1",
+      "totalPrice": 1600000,
+      "bookingDate": "2025-11-06T13:21:59.812Z",
+      "emailContact": "nhan1@gmail.com",
+      "phoneContact": "0914462297",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
+    },
+    {
+      "id": "BO1762437804494",
+      "confirmationCode": "HKQ2M2",
+      "totalPrice": 3600000,
+      "bookingDate": "2025-11-06T14:03:24.494Z",
+      "emailContact": "aadd@gmail.com",
+      "phoneContact": "0914462297",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
+    },
+    {
+      "id": "BO1762438090630",
+      "confirmationCode": "M7PJXT",
+      "totalPrice": 3300000,
+      "bookingDate": "2025-11-06T14:08:10.630Z",
+      "emailContact": "nhan@gmail.com",
+      "phoneContact": "0914462297",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
     }
   ],
   "bookingSegments": [
-    { "id": "BS01", "bookingOrderId": "BO01", "seatClassId": "SC01", "numSeats": 2, "status": "Confirmed" },
-    { "id": "BS02", "bookingOrderId": "BO01", "seatClassId": "SC02", "numSeats": 1, "status": "Confirmed" },
-    { "id": "BS03", "bookingOrderId": "BO02", "seatClassId": "SC03", "numSeats": 2, "status": "Confirmed" }
+    {
+      "id": "BS01",
+      "bookingOrderId": "BO01",
+      "seatClassId": "SC01",
+      "numSeats": 2,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS02",
+      "bookingOrderId": "BO01",
+      "seatClassId": "SC02",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS03",
+      "bookingOrderId": "BO02",
+      "seatClassId": "SC03",
+      "numSeats": 2,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS17624353198341",
+      "bookingOrderId": "BO1762435319812",
+      "seatClassId": "SC05",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS17624378045101",
+      "bookingOrderId": "BO1762437804494",
+      "seatClassId": "SC06",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "BS17624380906441",
+      "bookingOrderId": "BO1762438090630",
+      "seatClassId": "SC10",
+      "numSeats": 2,
+      "status": "Confirmed"
+    }
   ],
   "passengers": [
-    { "id": "P001", "firstName": "Anh", "lastName": "Nguyễn Văn", "birthDate": "1990-05-15" },
-    { "id": "P002", "firstName": "Bình", "lastName": "Trần Thị", "birthDate": "1995-08-20" },
-    { "id": "P003", "firstName": "Cường", "lastName": "Lê", "birthDate": "2000-11-01" }
+    {
+      "id": "P001",
+      "firstName": "Anh",
+      "lastName": "Nguyễn Văn",
+      "birthDate": "1990-05-15"
+    },
+    {
+      "id": "P002",
+      "firstName": "Bình",
+      "lastName": "Trần Thị",
+      "birthDate": "1995-08-20"
+    },
+    {
+      "id": "P003",
+      "firstName": "Cường",
+      "lastName": "Lê",
+      "birthDate": "2000-11-01"
+    }
   ],
   "bookingPassengers": [
-    { "id": "BP01", "bookingSegmentId": "BS01", "passengerId": "P001", "seatNumber": "15A" },
-    { "id": "BP02", "bookingSegmentId": "BS01", "passengerId": "P002", "seatNumber": "15B" },
-    { "id": "BP03", "bookingSegmentId": "BS02", "passengerId": "P003", "seatNumber": "1D" },
-    { "id": "BP04", "bookingSegmentId": "BS03", "passengerId": "P001", "seatNumber": "10C" },
-    { "id": "BP05", "bookingSegmentId": "BS03", "passengerId": "P002", "seatNumber": "10D" }
+    {
+      "id": "BP01",
+      "bookingSegmentId": "BS01",
+      "passengerId": "P001",
+      "seatNumber": "15A"
+    },
+    {
+      "id": "BP02",
+      "bookingSegmentId": "BS01",
+      "passengerId": "P002",
+      "seatNumber": "15B"
+    },
+    {
+      "id": "BP03",
+      "bookingSegmentId": "BS02",
+      "passengerId": "P003",
+      "seatNumber": "1D"
+    },
+    {
+      "id": "BP04",
+      "bookingSegmentId": "BS03",
+      "passengerId": "P001",
+      "seatNumber": "10C"
+    },
+    {
+      "id": "BP05",
+      "bookingSegmentId": "BS03",
+      "passengerId": "P002",
+      "seatNumber": "10D"
+    }
   ]
 }
