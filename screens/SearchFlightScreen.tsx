@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from "react-native";
 import RoundTripForm from "../components/SearchFlight/RoundTripForm";
 import OneWayForm from "../components/SearchFlight/OneWayForm";
 import MultiCityForm from "../components/SearchFlight/MultiCityForm";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import type { Airport } from "../types";
 
 const FlightSearchScreen = () => {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
   const [activeTab, setActiveTab] = useState<"round" | "oneway" | "multi">("round");
 
   // Shared state across all forms
@@ -17,6 +18,13 @@ const FlightSearchScreen = () => {
   const [sharedDepartDate, setSharedDepartDate] = useState<Date | null>(null);
   const [sharedReturnDate, setSharedReturnDate] = useState<Date | null>(null);
   const [sharedPassengers, setSharedPassengers] = useState<number>(1);
+
+  // Pre-fill destination if coming from HomeScreen
+  useEffect(() => {
+    if (route.params?.preSelectedDestination) {
+      setSharedToCity(route.params.preSelectedDestination);
+    }
+  }, [route.params?.preSelectedDestination]);
 
   const renderTab = () => {
     switch (activeTab) {
