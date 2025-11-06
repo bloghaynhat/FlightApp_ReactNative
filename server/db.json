@@ -347,6 +347,16 @@
       "phoneContact": "09123456789",
       "paymentMethod": "momo",
       "status": "Confirmed"
+    },
+    {
+      "id": "BO1762452665544",
+      "confirmationCode": "SM0RE7",
+      "totalPrice": 1500000,
+      "bookingDate": "2025-11-06T18:11:05.544Z",
+      "emailContact": "duc@gail.cpom",
+      "phoneContact": "09123456789",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
     }
   ],
   "bookingSegments": [
@@ -398,6 +408,15 @@
       "seatClassId": "SC01",
       "numSeats": 1,
       "status": "Confirmed"
+    },
+    {
+      "id": "6769",
+      "bookingOrderId": "BO1762452665544",
+      "flightId": "F001",
+      "leg": "outbound",
+      "seatClassId": "SC01",
+      "numSeats": 1,
+      "status": "Confirmed"
     }
   ],
   "passengers": [
@@ -442,6 +461,12 @@
       "firstName": "vvvv",
       "lastName": "aaaa",
       "birthDate": "09/08/2004"
+    },
+    {
+      "id": "eaeb",
+      "firstName": "d",
+      "lastName": "d",
+      "birthDate": "21/08/2004"
     }
   ],
   "bookingPassengers": [
@@ -511,6 +536,12 @@
       "id": "31aa",
       "bookingSegmentId": "bd2d",
       "passengerId": "82c8",
+      "seatNumber": null
+    },
+    {
+      "id": "eca4",
+      "bookingSegmentId": "6769",
+      "passengerId": "eaeb",
       "seatNumber": null
     }
   ]
