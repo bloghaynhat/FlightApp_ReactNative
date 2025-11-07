@@ -25,9 +25,20 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   // Memoize formatDate function
   const formatDate = useCallback((dateString?: string) => {
-    if (!dateString) return "";
-    const [year, month, day] = dateString.split("-");
-    return `${day}/${month}/${year}`;
+    if (!dateString) return { day: "", monthYear: "", dayOfWeek: "" };
+    const date = new Date(dateString);
+    const day = date.getDate().toString();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    const daysOfWeek = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+    const dayOfWeek = daysOfWeek[date.getDay()];
+
+    return {
+      day,
+      monthYear: `${month}\n${year}`,
+      dayOfWeek,
+    };
   }, []);
 
   // Memoize onDayPress để tránh tạo lại function mỗi lần render
@@ -142,38 +153,62 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   // Memoize formatted dates
   const formattedStartDate = useMemo(
-    () => (selectedRange.start ? formatDate(selectedRange.start) : "Chọn ngày"),
+    () => (selectedRange.start ? formatDate(selectedRange.start) : { day: "", monthYear: "", dayOfWeek: "" }),
     [selectedRange.start, formatDate]
   );
 
   const formattedEndDate = useMemo(
-    () => (selectedRange.end ? formatDate(selectedRange.end) : "Chọn ngày"),
+    () => (selectedRange.end ? formatDate(selectedRange.end) : { day: "", monthYear: "", dayOfWeek: "" }),
     [selectedRange.end, formatDate]
   );
 
   return (
     <View>
-      <View style={mode === "single" ? styles.dateInputsContainerSingle : styles.dateInputsContainer}>
+      <View style={styles.dateInputsContainer}>
         {/* Ô chọn ngày đi */}
         <TouchableOpacity
-          style={[styles.dateInput, mode === "single" ? styles.dateInputFull : styles.dateInputLeft]}
+          style={[styles.dateInput, styles.dateInputLeft, mode === "single" && styles.dateInputHalf]}
           onPress={() => openPicker(true)}
         >
-          <View>
-            <Text style={styles.dateLabel}>Ngày đi</Text>
-            <Text style={styles.dateValue}>{formattedStartDate}</Text>
+          <View style={styles.dateContent}>
+            <Text style={styles.dateLabel}>DEPARTURE</Text>
+            {formattedStartDate.day ? (
+              <>
+                <View style={styles.dateDisplay}>
+                  <Text style={styles.dateDay}>{formattedStartDate.day}</Text>
+                  <View style={styles.dateMonthYearContainer}>
+                    <Text style={styles.dateMonthYear}>{formattedStartDate.monthYear}</Text>
+                  </View>
+                </View>
+                <Text style={styles.dateDayOfWeek}>{formattedStartDate.dayOfWeek}</Text>
+              </>
+            ) : (
+              <Text style={styles.dateValue}>Chọn ngày</Text>
+            )}
           </View>
-          <Ionicons name="calendar-outline" size={20} color="#666" />
+          <Ionicons name="calendar-outline" size={20} color="#fff" />
         </TouchableOpacity>
 
         {/* Ô chọn ngày về - chỉ hiện khi mode = "range" */}
         {mode === "range" && (
           <TouchableOpacity style={[styles.dateInput, styles.dateInputRight]} onPress={() => openPicker(false)}>
-            <View>
-              <Text style={styles.dateLabel}>Ngày về</Text>
-              <Text style={styles.dateValue}>{formattedEndDate}</Text>
+            <View style={styles.dateContent}>
+              <Text style={styles.dateLabel}>RETURN</Text>
+              {formattedEndDate.day ? (
+                <>
+                  <View style={styles.dateDisplay}>
+                    <Text style={styles.dateDay}>{formattedEndDate.day}</Text>
+                    <View style={styles.dateMonthYearContainer}>
+                      <Text style={styles.dateMonthYear}>{formattedEndDate.monthYear}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.dateDayOfWeek}>{formattedEndDate.dayOfWeek}</Text>
+                </>
+              ) : (
+                <Text style={styles.dateValue}>Chọn ngày</Text>
+              )}
             </View>
-            <Ionicons name="calendar-outline" size={20} color="#666" />
+            <Ionicons name="calendar-outline" size={20} color="#fff" />
           </TouchableOpacity>
         )}
       </View>
@@ -215,12 +250,19 @@ const styles = StyleSheet.create({
   },
   dateInput: {
     flex: 1,
-    padding: 12,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
+    padding: 14,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    borderRadius: 12,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.4)",
+    minHeight: 100,
+  },
+  dateInputHalf: {
+    flex: 0,
+    width: "49%",
   },
   dateInputFull: {
     borderRightWidth: 0,
@@ -232,14 +274,48 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
   },
   dateLabel: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: 11,
+    color: "#fff",
+    fontWeight: "700",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  dateContent: {
+    flex: 1,
+  },
+  dateDisplay: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 4,
   },
+  dateDay: {
+    fontSize: 36,
+    color: "#fff",
+    fontWeight: "700",
+    marginRight: 8,
+    lineHeight: 40,
+  },
+  dateMonthYearContainer: {
+    justifyContent: "center",
+  },
+  dateMonthYear: {
+    fontSize: 12,
+    color: "#fff",
+    fontWeight: "600",
+    lineHeight: 16,
+  },
+  dateDayOfWeek: {
+    fontSize: 11,
+    color: "#fff",
+    fontWeight: "600",
+    textTransform: "uppercase",
+  },
   dateValue: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
+    fontSize: 15,
+    color: "#fff",
+    fontWeight: "600",
+    marginVertical: 8,
   },
   modalContainer: {
     flex: 1,

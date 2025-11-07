@@ -1,22 +1,23 @@
-import React from "react"
-import { useState } from "react"
-import { View, Text, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native"
-import { useNavigation, type RouteProp, useRoute } from "@react-navigation/native"
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { MaterialCommunityIcons } from "@expo/vector-icons"
-import { LinearGradient } from "expo-linear-gradient"
-import type { RootStackParamList } from "../types/types"
-import apiClient from "../apis/apiClient"
-import PaymentHeader from "../components/Payment/PaymentHeader"
+import React from "react";
+import { useState } from "react";
+import { View, Text, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native";
+import { useNavigation, type RouteProp, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import type { RootStackParamList } from "../types/types";
+import apiClient from "../apis/apiClient";
+import PaymentHeader from "../components/Payment/PaymentHeader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-type PaymentMethodRouteProp = RouteProp<RootStackParamList, "PaymentMethod">
+type PaymentMethodRouteProp = RouteProp<RootStackParamList, "PaymentMethod">;
 
 interface PaymentMethodOption {
-  id: string
-  label: string
-  icon: string
-  description: string
-  color: string
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  color: string;
 }
 
 const PAYMENT_METHODS: PaymentMethodOption[] = [
@@ -41,23 +42,23 @@ const PAYMENT_METHODS: PaymentMethodOption[] = [
     description: "Visa, Mastercard",
     color: "#1E40AF",
   },
-]
+];
 
 const PaymentMethodScreen: React.FC = () => {
-  const [paymentMethod, setPaymentMethod] = useState("momo")
-  const [loading, setLoading] = useState(false)
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const route = useRoute<PaymentMethodRouteProp>()
-  const bookingPayload = route.params?.bookingPayload
+  const [paymentMethod, setPaymentMethod] = useState("momo");
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<PaymentMethodRouteProp>();
+  const bookingPayload = route.params?.bookingPayload;
 
-  const genConfirmationCode = () => Math.random().toString(36).substring(2, 8).toUpperCase()
+  const genConfirmationCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
 
   const handleProceedToPayment = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await new Promise((res) => setTimeout(res, 1200))
+      await new Promise((res) => setTimeout(res, 1200));
 
-      const confirmationCode = genConfirmationCode()
+      const confirmationCode = genConfirmationCode();
       const bookingOrder = {
         id: `BO${Date.now()}`,
         confirmationCode,
@@ -67,136 +68,138 @@ const PaymentMethodScreen: React.FC = () => {
         phoneContact: bookingPayload?.contact?.phone ?? "",
         paymentMethod,
         status: "Confirmed",
-      }
+      };
 
-      const resp = await apiClient.post("/bookingOrders", bookingOrder)
+      const resp = await apiClient.post("/bookingOrders", bookingOrder);
 
       if (resp.status === 201) {
-        const created = resp.data
+        const created = resp.data;
 
         // Normalize passengers into an array of passenger objects (or placeholders)
         const passengersArray = Array.isArray(bookingPayload?.passengers)
           ? bookingPayload.passengers
-          : Array.from({ length: bookingPayload?.passengers || 1 }).map((_, i) => ({ firstName: `Passenger${i + 1}` }))
+          : Array.from({ length: bookingPayload?.passengers || 1 }).map((_, i) => ({ firstName: `Passenger${i + 1}` }));
 
         // --- AVAILABILITY CHECK ---
         const checkSeatAvailability = async (seatClassId: string, neededSeats: number) => {
           try {
-            const scResp = await apiClient.get(`/seatClasses/${seatClassId}`)
-            const seatClass = scResp.data
-            if (!seatClass) return { ok: false, available: 0 }
-            const segResp = await apiClient.get(`/bookingSegments?seatClassId=${seatClassId}`)
-            const existingSegments = Array.isArray(segResp.data) ? segResp.data : []
-            const reserved = existingSegments.reduce((sum: number, s: any) => sum + (s.numSeats || 0), 0)
-            const available = (seatClass.totalSeats || 0) - reserved
-            return { ok: available >= neededSeats, available }
+            const scResp = await apiClient.get(`/seatClasses/${seatClassId}`);
+            const seatClass = scResp.data;
+            if (!seatClass) return { ok: false, available: 0 };
+            const segResp = await apiClient.get(`/bookingSegments?seatClassId=${seatClassId}`);
+            const existingSegments = Array.isArray(segResp.data) ? segResp.data : [];
+            const reserved = existingSegments.reduce((sum: number, s: any) => sum + (s.numSeats || 0), 0);
+            const available = (seatClass.totalSeats || 0) - reserved;
+            return { ok: available >= neededSeats, available };
           } catch (err) {
-            console.warn('Seat availability check failed', err)
-            return { ok: true, available: Infinity }
+            console.warn("Seat availability check failed", err);
+            return { ok: true, available: Infinity };
           }
-        }
+        };
 
-        const needed = passengersArray.length
+        const needed = passengersArray.length;
         if (bookingPayload?.selectedSeatClassId) {
-          const result = await checkSeatAvailability(bookingPayload.selectedSeatClassId, needed)
+          const result = await checkSeatAvailability(bookingPayload.selectedSeatClassId, needed);
           if (!result.ok) {
-            setLoading(false)
-            Alert.alert('Không đủ ghế', `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedSeatClassId}. Vui lòng chọn hạng khác hoặc giảm số hành khách.`)
-            return
+            setLoading(false);
+            Alert.alert(
+              "Không đủ ghế",
+              `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedSeatClassId}. Vui lòng chọn hạng khác hoặc giảm số hành khách.`
+            );
+            return;
           }
         }
         if (bookingPayload?.selectedReturnSeatClassId) {
-          const result = await checkSeatAvailability(bookingPayload.selectedReturnSeatClassId, needed)
+          const result = await checkSeatAvailability(bookingPayload.selectedReturnSeatClassId, needed);
           if (!result.ok) {
-            setLoading(false)
-            Alert.alert('Không đủ ghế', `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedReturnSeatClassId} (chiều về). Vui lòng chọn hạng khác hoặc giảm số hành khách.`)
-            return
+            setLoading(false);
+            Alert.alert(
+              "Không đủ ghế",
+              `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedReturnSeatClassId} (chiều về). Vui lòng chọn hạng khác hoặc giảm số hành khách.`
+            );
+            return;
           }
         }
 
         // Create bookingSegments per leg (one segment per leg, numSeats = passengerCount)
-        const segmentsCreated: any[] = []
-        const outboundFlightId = bookingPayload?.outboundFlight?.id ?? bookingPayload?.flight?.id
-        const returnFlightId = bookingPayload?.returnFlight?.id
+        const segmentsCreated: any[] = [];
+        const outboundFlightId = bookingPayload?.outboundFlight?.id ?? bookingPayload?.flight?.id;
+        const returnFlightId = bookingPayload?.returnFlight?.id;
 
         if (bookingPayload?.selectedSeatClassId) {
           const segBody: any = {
             bookingOrderId: created.id,
             flightId: outboundFlightId,
-            leg: 'outbound',
+            leg: "outbound",
             seatClassId: bookingPayload.selectedSeatClassId,
             numSeats: needed,
-            status: 'Confirmed',
-          }
-          const segResp = await apiClient.post('/bookingSegments', segBody)
-          if (segResp.status === 201) segmentsCreated.push(segResp.data)
+            status: "Confirmed",
+          };
+          const segResp = await apiClient.post("/bookingSegments", segBody);
+          if (segResp.status === 201) segmentsCreated.push(segResp.data);
         }
 
         if (bookingPayload?.selectedReturnSeatClassId && returnFlightId) {
           const segBody: any = {
             bookingOrderId: created.id,
             flightId: returnFlightId,
-            leg: 'return',
+            leg: "return",
             seatClassId: bookingPayload.selectedReturnSeatClassId,
             numSeats: needed,
-            status: 'Confirmed',
-          }
-          const segResp = await apiClient.post('/bookingSegments', segBody)
-          if (segResp.status === 201) segmentsCreated.push(segResp.data)
+            status: "Confirmed",
+          };
+          const segResp = await apiClient.post("/bookingSegments", segBody);
+          if (segResp.status === 201) segmentsCreated.push(segResp.data);
         }
 
         // Create normalized passengers (POST /passengers if missing) and collect their ids
-        const createdPassengers: any[] = []
+        const createdPassengers: any[] = [];
         for (let i = 0; i < passengersArray.length; i++) {
-          const p = passengersArray[i]
+          const p = passengersArray[i];
           if (p?.id) {
-            createdPassengers.push(p)
-            continue
+            createdPassengers.push(p);
+            continue;
           }
-          const pBody = { firstName: p.firstName ?? '', lastName: p.lastName ?? '', birthDate: p.birthDate ?? null }
-          const pResp = await apiClient.post('/passengers', pBody)
-          if (pResp.status === 201) createdPassengers.push(pResp.data)
+          const pBody = { firstName: p.firstName ?? "", lastName: p.lastName ?? "", birthDate: p.birthDate ?? null };
+          const pResp = await apiClient.post("/passengers", pBody);
+          if (pResp.status === 201) createdPassengers.push(pResp.data);
         }
 
         // Create bookingPassengers mapping entries for each segment × passenger
-        const createdBookingPassengers: any[] = []
+        const createdBookingPassengers: any[] = [];
         for (const seg of segmentsCreated) {
           for (let i = 0; i < createdPassengers.length; i++) {
-            const p = createdPassengers[i]
-            const bpBody = { bookingSegmentId: seg.id, passengerId: p.id, seatNumber: null }
-            const bpResp = await apiClient.post('/bookingPassengers', bpBody)
-            if (bpResp.status === 201) createdBookingPassengers.push(bpResp.data)
+            const p = createdPassengers[i];
+            const bpBody = { bookingSegmentId: seg.id, passengerId: p.id, seatNumber: null };
+            const bpResp = await apiClient.post("/bookingPassengers", bpBody);
+            if (bpResp.status === 201) createdBookingPassengers.push(bpResp.data);
           }
         }
 
-        setLoading(false)
-        navigation.navigate('BookingConfirmation', { booking: created, segments: segmentsCreated, bookingPassengers: createdBookingPassengers, passengers: createdPassengers })
-        return
+        setLoading(false);
+        navigation.navigate("BookingConfirmation", {
+          booking: created,
+          segments: segmentsCreated,
+          bookingPassengers: createdBookingPassengers,
+          passengers: createdPassengers,
+        });
+        return;
       }
-      setLoading(false)
-      Alert.alert("Thanh toán", `Thanh toán thành công. Mã xác nhận: ${confirmationCode}`)
-      navigation.navigate("BookingConfirmation", { booking: resp.data, segments: [] })
+      setLoading(false);
+      Alert.alert("Thanh toán", `Thanh toán thành công. Mã xác nhận: ${confirmationCode}`);
+      navigation.navigate("BookingConfirmation", { booking: resp.data, segments: [] });
     } catch (error) {
-      setLoading(false)
-      console.error("Create booking error", error)
-      Alert.alert("Lỗi", "Không thể tạo BookingOrder. Vui lòng thử lại.")
+      setLoading(false);
+      console.error("Create booking error", error);
+      Alert.alert("Lỗi", "Không thể tạo BookingOrder. Vui lòng thử lại.");
     }
-  }
+  };
 
   return (
-    <View style={styles.container}>
-      {/* Back button */}
-      <View style={styles.topNav}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <MaterialCommunityIcons name="arrow-left" size={22} color="#1f2937" />
-          <Text style={styles.backButtonText}>Quay lại</Text>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <PaymentHeader title="Payment method" currentStep={4} totalSteps={4} showBackButton={true} />
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
-        {/* Header */}
-        <PaymentHeader title="Thanh toán" currentStep={3} totalSteps={4} />
-
         {/* Title */}
         <View style={styles.titleSection}>
           <Text style={styles.title}>Chọn phương thức thanh toán</Text>
@@ -256,31 +259,14 @@ const PaymentMethodScreen: React.FC = () => {
           </LinearGradient>
         )}
       </ScrollView>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
-  },
-  topNav: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 6,
-    backgroundColor: "transparent",
-  },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  backButtonText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#1f2937",
-    fontWeight: "600",
   },
   scrollView: {
     flex: 1,
@@ -429,6 +415,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "white",
   },
-})
+});
 
-export default PaymentMethodScreen
+export default PaymentMethodScreen;
