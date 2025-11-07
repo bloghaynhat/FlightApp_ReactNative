@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { View, FlatList, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { flightService, FlightResult } from "../apis/flightService";
@@ -35,6 +35,8 @@ const SearchResultScreen: React.FC = () => {
   const [fromAirport, setFromAirport] = useState<Airport | null>(null);
   const [toAirport, setToAirport] = useState<Airport | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFlight, setSelectedFlight] = useState<FlightResult | null>(null);
+  const [selectedSeatClassId, setSelectedSeatClassId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -69,28 +71,37 @@ const SearchResultScreen: React.FC = () => {
     }
   };
 
-  const handleFlightPress = (flight: FlightResult) => {
+  const handleFlightPress = (flight: FlightResult, seatClassId: string) => {
+    setSelectedFlight(flight);
+    setSelectedSeatClassId(seatClassId);
+  };
+
+  const handleContinue = () => {
+    if (!selectedFlight || !selectedSeatClassId) return;
+
     // Navigate to passenger info for OneWay
     if (tripType === "oneWay") {
       // Navigate within the same BookFlightStack
       (navigation as any).navigate("PassengerInfo", {
-        flight,
+        flight: selectedFlight,
         fromAirport,
         toAirport,
         departDate,
         passengers,
         tripType,
+        selectedSeatClassId,
       });
     } else {
       // For RoundTrip: Navigate to return flight selection
       (navigation as any).navigate("ReturnFlightSelection", {
-        outboundFlight: flight,
+        outboundFlight: selectedFlight,
         fromAirportId: fromAirportId,
         toAirportId: toAirportId,
         departDate,
         returnDate,
         passengers,
         tripType,
+        selectedSeatClassId,
       });
     }
   };
@@ -132,21 +143,31 @@ const SearchResultScreen: React.FC = () => {
       {flights.length === 0 ? (
         <EmptyState />
       ) : (
-        <FlatList
-          data={flights}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleFlightPress(item)}>
+        <>
+          <FlatList
+            data={flights}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
               <FlightCard
                 flight={item}
                 fromAirport={fromAirport}
                 toAirport={toAirport}
-                onPress={() => handleFlightPress(item)}
+                selectedSeatClassId={selectedFlight?.id === item.id ? selectedSeatClassId : null}
+                onSelectSeatClass={(seatClassId) => handleFlightPress(item, seatClassId)}
               />
-            </TouchableOpacity>
+            )}
+            contentContainerStyle={styles.listContent}
+          />
+
+          {/* Global Continue Button */}
+          {selectedFlight && selectedSeatClassId && (
+            <View style={styles.continueContainer}>
+              <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+                <Text style={styles.continueButtonText}>Continue</Text>
+              </TouchableOpacity>
+            </View>
           )}
-          contentContainerStyle={styles.listContent}
-        />
+        </>
       )}
     </SafeAreaView>
   );
@@ -159,6 +180,34 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingVertical: 8,
+    paddingBottom: 100, // Add space for continue button
+  },
+  continueContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e5e5",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  continueButton: {
+    backgroundColor: "#0070BB",
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  continueButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
   },
 });
 

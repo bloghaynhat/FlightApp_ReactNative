@@ -18,8 +18,19 @@ type PassengerInfoScreenNavigationProp = NativeStackNavigationProp<RootStackPara
 const PassengerInfoScreen: React.FC = () => {
   const route = useRoute<PassengerInfoScreenRouteProp>();
   const navigation = useNavigation<PassengerInfoScreenNavigationProp>();
-  const { flight, outboundFlight, returnFlight, fromAirport, toAirport, departDate, returnDate, passengers, tripType } =
-    route.params;
+  const {
+    flight,
+    outboundFlight,
+    returnFlight,
+    fromAirport,
+    toAirport,
+    departDate,
+    returnDate,
+    passengers,
+    tripType,
+    selectedSeatClassId: initialSelectedSeatClassId,
+    selectedReturnSeatClassId: initialSelectedReturnSeatClassId,
+  } = route.params;
 
   // Get the appropriate flight(s) based on trip type
   const isRoundTrip = tripType === "roundTrip";
@@ -39,11 +50,11 @@ const PassengerInfoScreen: React.FC = () => {
     phone: "",
   });
 
-  const [selectedSeatClassId, setSelectedSeatClassId] = useState<string>(mainFlight?.seatClasses?.[0]?.id || "");
-
-  const [selectedReturnSeatClassId, setSelectedReturnSeatClassId] = useState<string>(
-    isRoundTrip && returnFlight?.seatClasses?.[0]?.id ? returnFlight.seatClasses[0].id : ""
-  );
+  // Use seat class IDs from route params (already selected in SearchResult screen)
+  const selectedSeatClassId = initialSelectedSeatClassId || mainFlight?.seatClasses?.[0]?.id || "";
+  const selectedReturnSeatClassId =
+    initialSelectedReturnSeatClassId ||
+    (isRoundTrip && returnFlight?.seatClasses?.[0]?.id ? returnFlight.seatClasses[0].id : "");
 
   const updatePassenger = (index: number, field: keyof PassengerData, value: string) => {
     const newList = [...passengerList];
@@ -162,46 +173,6 @@ const PassengerInfoScreen: React.FC = () => {
                 {returnDate ? new Date(returnDate).toLocaleDateString("vi-VN") : ""}
               </Text>
             </View>
-          </View>
-        )}
-
-        {/* Seat Class Selection - Outbound */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{isRoundTrip ? "Chọn hạng vé chiều đi" : "Chọn hạng vé"}</Text>
-          {mainFlight.seatClasses?.map((seatClass) => (
-            <TouchableOpacity
-              key={seatClass.id}
-              style={[styles.seatClassOption, selectedSeatClassId === seatClass.id && styles.seatClassSelected]}
-              onPress={() => setSelectedSeatClassId(seatClass.id)}
-            >
-              <View>
-                <Text style={styles.seatClassName}>{seatClass.className}</Text>
-                <Text style={styles.seatClassPrice}>{formatPrice(seatClass.price)}</Text>
-              </View>
-              {selectedSeatClassId === seatClass.id && <Ionicons name="checkmark-circle" size={24} color="#0066cc" />}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Seat Class Selection - Return (for RoundTrip) */}
-        {isRoundTrip && returnFlight && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chọn hạng vé chiều về</Text>
-            {returnFlight.seatClasses?.map((seatClass) => (
-              <TouchableOpacity
-                key={seatClass.id}
-                style={[styles.seatClassOption, selectedReturnSeatClassId === seatClass.id && styles.seatClassSelected]}
-                onPress={() => setSelectedReturnSeatClassId(seatClass.id)}
-              >
-                <View>
-                  <Text style={styles.seatClassName}>{seatClass.className}</Text>
-                  <Text style={styles.seatClassPrice}>{formatPrice(seatClass.price)}</Text>
-                </View>
-                {selectedReturnSeatClassId === seatClass.id && (
-                  <Ionicons name="checkmark-circle" size={24} color="#0066cc" />
-                )}
-              </TouchableOpacity>
-            ))}
           </View>
         )}
 
