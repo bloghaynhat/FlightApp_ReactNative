@@ -8,6 +8,7 @@ import { airportService } from "../apis/airportService";
 import { FlightCard } from "../components/SearchResult/FlightCard";
 import { LoadingState } from "../components/SearchResult/LoadingState";
 import { EmptyState } from "../components/SearchResult/EmptyState";
+import PaymentHeader from "../components/Payment/PaymentHeader";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import type { Airport } from "../types";
 
@@ -96,19 +97,7 @@ const ReturnFlightSelectionScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Chọn chuyến bay chiều về</Text>
-          <Text style={styles.headerSubtitle}>
-            {fromAirport.code} → {toAirport.code}
-          </Text>
-        </View>
-        <View style={{ width: 24 }} />
-      </View>
+      <PaymentHeader title="Select return flight" currentStep={1} totalSteps={4} showBackButton={true} />
 
       {/* Selected Outbound Flight Banner */}
       <View style={styles.selectedBanner}>
@@ -152,30 +141,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  headerContent: {
-    flex: 1,
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 2,
   },
   selectedBanner: {
     flexDirection: "row",

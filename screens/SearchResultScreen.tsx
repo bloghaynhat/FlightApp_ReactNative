@@ -7,7 +7,7 @@ import { airportService } from "../apis/airportService";
 import { FlightCard } from "../components/SearchResult/FlightCard";
 import { LoadingState } from "../components/SearchResult/LoadingState";
 import { EmptyState } from "../components/SearchResult/EmptyState";
-import { SearchHeader } from "../components/SearchResult/SearchHeader";
+import PaymentHeader from "../components/Payment/PaymentHeader";
 import type { Airport } from "../types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -72,21 +72,14 @@ const SearchResultScreen: React.FC = () => {
   const handleFlightPress = (flight: FlightResult) => {
     // Navigate to passenger info for OneWay
     if (tripType === "oneWay") {
-      // PassengerInfo now lives inside the HomeStack (MainTabs -> Home)
-      // Navigate to the nested route so the screen is found
-      (navigation as any).navigate("MainTabs", {
-        screen: "Home",
-        params: {
-          screen: "PassengerInfo",
-          params: {
-            flight,
-            fromAirport,
-            toAirport,
-            departDate,
-            passengers,
-            tripType,
-          },
-        },
+      // Navigate within the same BookFlightStack
+      (navigation as any).navigate("PassengerInfo", {
+        flight,
+        fromAirport,
+        toAirport,
+        departDate,
+        passengers,
+        tripType,
       });
     } else {
       // For RoundTrip: Navigate to return flight selection
@@ -102,8 +95,19 @@ const SearchResultScreen: React.FC = () => {
     }
   };
 
-  const handleModifySearch = () => {
+  const handleBackPress = () => {
+    // Navigate back within the same stack
     navigation.goBack();
+  };
+
+  const handleClosePress = () => {
+    // Navigate to Home tab
+    (navigation as any).navigate("MainTabs", {
+      screen: "Home",
+      params: {
+        screen: "Home",
+      },
+    });
   };
 
   if (loading) {
@@ -116,13 +120,13 @@ const SearchResultScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SearchHeader
-        fromAirport={fromAirport}
-        toAirport={toAirport}
-        departDate={new Date(departDate)}
-        returnDate={returnDate ? new Date(returnDate) : null}
-        passengers={passengers}
-        onModify={handleModifySearch}
+      <PaymentHeader
+        title="Select flight"
+        currentStep={1}
+        totalSteps={4}
+        showBackButton={true}
+        onBackPress={handleBackPress}
+        onClosePress={handleClosePress}
       />
 
       {flights.length === 0 ? (

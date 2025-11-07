@@ -4,6 +4,7 @@ import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import PaymentHeader from "../components/Payment/PaymentHeader";
 import type { FlightResult } from "../apis/flightService";
 import type { Airport } from "../types";
 import type { RootStackParamList, PassengerData, ContactData } from "../types/types";
@@ -103,7 +104,6 @@ const PassengerInfoScreen: React.FC = () => {
     } as any);
   };
 
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -130,14 +130,7 @@ const PassengerInfoScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thông tin hành khách</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <PaymentHeader title="Passenger details" currentStep={2} totalSteps={4} showBackButton={true} />
 
       <ScrollView style={styles.content}>
         {/* Flight Summary - Outbound */}
@@ -296,21 +289,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
   },
   content: {
     flex: 1,

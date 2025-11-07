@@ -38,8 +38,14 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
 
   const handleSearch = () => {
     if (fromCity && toCity && departDate) {
-      // Navigate to search results
-      navigation.navigate("SearchResult", {
+      // Validate that from and to cities are different
+      if (fromCity.id === toCity.id) {
+        alert("Departure and arrival airports must be different!");
+        return;
+      }
+
+      // Navigate to search results in BookFlight stack
+      (navigation as any).navigate("SearchResult", {
         fromAirportId: fromCity.id,
         toAirportId: toCity.id,
         departDate: departDate.toISOString().split("T")[0],
@@ -49,7 +55,7 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
     }
   };
 
-  const isFormValid = fromCity && toCity && departDate;
+  const isFormValid = fromCity && toCity && departDate && fromCity.id !== toCity.id;
 
   return (
     <ScrollView style={styles.container}>
