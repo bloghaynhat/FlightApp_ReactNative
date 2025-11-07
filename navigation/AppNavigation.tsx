@@ -24,7 +24,7 @@ const ProfileScreen = () => (
 
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="HomeScreen" component={HomeScreen} />
   </Stack.Navigator>
 );
 
@@ -85,8 +85,8 @@ const BottomTabs = () => (
         },
       })}
       options={({ route }) => {
-        const routeName = getFocusedRouteNameFromRoute(route);
-        // Ẩn tab bar cho các màn hình booking
+        const routeName = getFocusedRouteNameFromRoute(route) ?? "SearchFlight";
+        // Ẩn tab bar cho tất cả các màn hình trong booking flow
         const hideTabScreens = [
           "SearchFlight",
           "SearchResult",
@@ -99,7 +99,7 @@ const BottomTabs = () => (
 
         return {
           tabBarLabel: "Đặt vé",
-          tabBarStyle: hideTabScreens.includes(routeName ?? "") ? { display: "none" } : undefined,
+          tabBarStyle: hideTabScreens.includes(routeName) ? { display: "none" } : undefined,
         };
       }}
     />
