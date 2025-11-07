@@ -169,7 +169,12 @@ const PassengerInfoScreen: React.FC = () => {
     // Now PassengerInfo is in the same HomeStack as PaymentInfo,
     // so we can navigate directly by route name and pass params.
     navigation.navigate("PaymentInfo", {
-      flight,
+      // Ensure we pass the selected main flight (outbound) as `flight` so PaymentInfo
+      // always receives the outbound flight regardless of how this screen was reached.
+      flight: mainFlight,
+      // Also forward airport objects so PaymentInfo can display friendly names/codes
+      fromAirport,
+      toAirport,
       passengers: passengerList,
       contact,
       selectedSeatClassId,
@@ -433,14 +438,14 @@ const PassengerInfoScreen: React.FC = () => {
                             {Math.floor(
                               (new Date(mainFlight.arrivalTime).getTime() -
                                 new Date(mainFlight.departureTime).getTime()) /
-                                (1000 * 60 * 60)
+                              (1000 * 60 * 60)
                             )}{" "}
                             hours{" "}
                             {Math.floor(
                               ((new Date(mainFlight.arrivalTime).getTime() -
                                 new Date(mainFlight.departureTime).getTime()) %
                                 (1000 * 60 * 60)) /
-                                (1000 * 60)
+                              (1000 * 60)
                             )}{" "}
                             minutes
                           </Text>
@@ -503,14 +508,14 @@ const PassengerInfoScreen: React.FC = () => {
                           {Math.floor(
                             (new Date(returnFlight.arrivalTime).getTime() -
                               new Date(returnFlight.departureTime).getTime()) /
-                              (1000 * 60 * 60)
+                            (1000 * 60 * 60)
                           )}{" "}
                           hours{" "}
                           {Math.floor(
                             ((new Date(returnFlight.arrivalTime).getTime() -
                               new Date(returnFlight.departureTime).getTime()) %
                               (1000 * 60 * 60)) /
-                              (1000 * 60)
+                            (1000 * 60)
                           )}{" "}
                           minutes
                         </Text>
