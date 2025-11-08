@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import type { FlightResult } from "../../apis/flightService";
 import type { Airport } from "../../types";
 
@@ -7,13 +7,25 @@ interface FlightCardProps {
   flight: FlightResult;
   fromAirport: Airport;
   toAirport: Airport;
-  onPress: () => void;
+  selectedSeatClassId?: string | null;
+  onSelectSeatClass: (seatClassId: string) => void;
 }
 
-export const FlightCard: React.FC<FlightCardProps> = ({ flight, fromAirport, toAirport }) => {
+export const FlightCard: React.FC<FlightCardProps> = ({
+  flight,
+  fromAirport,
+  toAirport,
+  selectedSeatClassId,
+  onSelectSeatClass,
+}) => {
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-GB");
   };
 
   const calculateDuration = (departure: string, arrival: string) => {
@@ -22,68 +34,70 @@ export const FlightCard: React.FC<FlightCardProps> = ({ flight, fromAirport, toA
     const diffMs = end.getTime() - start.getTime();
     const hours = Math.floor(diffMs / (1000 * 60 * 60));
     const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
+    return `${hours} hours ${minutes} minutes`;
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
+    return new Intl.NumberFormat("vi-VN").format(price) + " VND";
   };
-
-  const lowestPrice =
-    flight.seatClasses && flight.seatClasses.length > 0 ? Math.min(...flight.seatClasses.map((sc) => sc.price)) : 0;
 
   return (
     <View style={styles.card}>
-      {/* Header: Airline */}
-      <View style={styles.header}>
-        {flight.airline?.logo && (
-          <Image source={{ uri: flight.airline.logo }} style={styles.airlineLogo} resizeMode="contain" />
-        )}
-        <View style={styles.airlineInfo}>
-          <Text style={styles.airlineName}>{flight.airline?.name || "Airline"}</Text>
-          <Text style={styles.flightNumber}>{flight.flightNumber}</Text>
-        </View>
-      </View>
-
-      {/* Flight Route */}
-      <View style={styles.routeContainer}>
-        <View style={styles.timeBlock}>
-          <Text style={styles.time}>{formatTime(flight.departureTime)}</Text>
+      {/* Flight Info Header */}
+      <View style={styles.flightHeader}>
+        <View style={styles.dateTimeBlock}>
+          <Text style={styles.dateText}>{formatDate(flight.departureTime)}</Text>
+          <Text style={styles.timeText}>{formatTime(flight.departureTime)}</Text>
           <Text style={styles.cityCode}>{fromAirport.code}</Text>
         </View>
 
         <View style={styles.durationBlock}>
-          <Text style={styles.duration}>{calculateDuration(flight.departureTime, flight.arrivalTime)}</Text>
-          <View style={styles.line}>
-            <View style={styles.dot} />
-            <View style={styles.solidLine} />
-            <View style={styles.dot} />
+          <Text style={styles.durationText}>{calculateDuration(flight.departureTime, flight.arrivalTime)}</Text>
+          <View style={styles.flightLine}>
+            <View style={styles.lineWithPlane}>
+              <View style={styles.dottedLine} />
+              <Text style={styles.planeIcon}>✈️</Text>
+            </View>
           </View>
-          <Text style={styles.directText}>Bay thẳng</Text>
+          <Text style={styles.stopText}>Non stop</Text>
         </View>
 
-        <View style={styles.timeBlock}>
-          <Text style={styles.time}>{formatTime(flight.arrivalTime)}</Text>
+        <View style={styles.dateTimeBlock}>
+          <Text style={styles.dateText}>{formatDate(flight.arrivalTime)}</Text>
+          <Text style={styles.timeText}>{formatTime(flight.arrivalTime)}</Text>
           <Text style={styles.cityCode}>{toAirport.code}</Text>
         </View>
       </View>
 
-      {/* Price */}
-      <View style={styles.footer}>
-        <View>
-          <Text style={styles.priceLabel}>Từ</Text>
-          <Text style={styles.price}>{formatPrice(lowestPrice)}</Text>
-        </View>
-        <View style={styles.seatsInfo}>
-          {flight.seatClasses?.map((sc) => (
-            <Text key={sc.id} style={styles.seatClass}>
-              {sc.className}
-            </Text>
-          ))}
-        </View>
+      {/* Flight Number */}
+      <Text style={styles.flightNumber}>
+        {flight.flightNumber}/{flight.airline?.name || "AIRBUS A321"}
+      </Text>
+
+      {/* Seat Classes */}
+      <View style={styles.seatClassesContainer}>
+        {flight.seatClasses?.map((seatClass) => {
+          const isSelected = selectedSeatClassId === seatClass.id;
+          return (
+            <View key={seatClass.id} style={styles.seatClassRow}>
+              <View style={styles.seatClassInfo}>
+                <Text style={styles.seatClassName}>
+                  {seatClass.className}({seatClass.className.charAt(0)})
+                </Text>
+                <Text style={styles.refundableText}>Refundable</Text>
+                <Text style={styles.priceText}>{formatPrice(seatClass.price)}</Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.selectButton, isSelected && styles.selectButtonSelected]}
+                onPress={() => onSelectSeatClass(seatClass.id)}
+              >
+                <Text style={[styles.selectButtonText, isSelected && styles.selectButtonTextSelected]}>
+                  {isSelected ? "Selecting" : "Select"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -92,115 +106,139 @@ export const FlightCard: React.FC<FlightCardProps> = ({ flight, fromAirport, toA
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     marginHorizontal: 16,
     marginVertical: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
   },
-  header: {
+  flightHeader: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  airlineLogo: {
-    width: 40,
-    height: 40,
-    marginRight: 12,
-  },
-  airlineInfo: {
-    flex: 1,
-  },
-  airlineName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  flightNumber: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
-  },
-  routeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    alignItems: "center",
+    marginBottom: 12,
   },
-  timeBlock: {
+  dateTimeBlock: {
     alignItems: "center",
   },
-  time: {
-    fontSize: 20,
+  dateText: {
+    fontSize: 12,
+    color: "#999",
+    marginBottom: 4,
+  },
+  timeText: {
+    fontSize: 24,
     fontWeight: "700",
     color: "#000",
     marginBottom: 4,
   },
   cityCode: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#666",
     fontWeight: "600",
   },
   durationBlock: {
     flex: 1,
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
-  duration: {
-    fontSize: 12,
+  durationText: {
+    fontSize: 11,
     color: "#666",
-    marginBottom: 4,
+    marginBottom: 8,
+    textAlign: "center",
   },
-  line: {
-    flexDirection: "row",
-    alignItems: "center",
+  flightLine: {
     width: "100%",
-    marginBottom: 4,
+    marginBottom: 6,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#0066cc",
+  lineWithPlane: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  solidLine: {
-    flex: 1,
+  dottedLine: {
+    width: "100%",
     height: 2,
-    backgroundColor: "#0066cc",
-    marginHorizontal: 4,
+    backgroundColor: "#ccc",
+    borderStyle: "dotted",
+    borderWidth: 1,
+    borderColor: "#999",
   },
-  directText: {
+  planeIcon: {
+    position: "absolute",
+    fontSize: 16,
+    top: -12,
+  },
+  stopText: {
     fontSize: 10,
-    color: "#0066cc",
+    color: "#000",
+    fontWeight: "500",
   },
-  footer: {
+  flightNumber: {
+    fontSize: 14,
+    color: "#000",
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  seatClassesContainer: {
+    gap: 12,
+  },
+  seatClassRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-    paddingTop: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
-  priceLabel: {
-    fontSize: 12,
-    color: "#666",
+  seatClassInfo: {
+    flex: 1,
+  },
+  seatClassName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
     marginBottom: 4,
   },
-  price: {
+  refundableText: {
+    fontSize: 12,
+    color: "#999",
+    marginBottom: 4,
+  },
+  priceText: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#ff6b35",
+    color: "#0070BB",
   },
-  seatsInfo: {
-    alignItems: "flex-end",
+  selectButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#000",
+    backgroundColor: "#fff",
   },
-  seatClass: {
-    fontSize: 11,
-    color: "#0066cc",
-    marginTop: 2,
+  selectButtonSelected: {
+    backgroundColor: "#0070BB",
+    borderColor: "#0070BB",
+  },
+  selectButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+  },
+  selectButtonTextSelected: {
+    color: "#fff",
   },
 });

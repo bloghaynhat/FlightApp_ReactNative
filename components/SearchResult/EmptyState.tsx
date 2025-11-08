@@ -6,12 +6,12 @@ interface EmptyStateProps {
   message?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ message = "Không tìm thấy chuyến bay phù hợp" }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ message = "No flights found" }) => {
   return (
     <View style={styles.container}>
       <Ionicons name="airplane-outline" size={64} color="#ccc" />
       <Text style={styles.message}>{message}</Text>
-      <Text style={styles.suggestion}>Vui lòng thử tìm kiếm với thông tin khác</Text>
+      <Text style={styles.suggestion}>Please try searching with different criteria</Text>
     </View>
   );
 };

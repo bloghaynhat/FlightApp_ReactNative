@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import SearchFlightScreen from "../screens/SearchFlightScreen";
@@ -10,12 +10,13 @@ import ReturnFlightSelectionScreen from "../screens/ReturnFlightSelectionScreen"
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
-import QRCodeScreen from "../screens/QRCodeScreen";
 import PaymentInfoScreen from "../screens/PaymentInfoScreen";
+import FlightLookupScreen from "../screens/FlightLookupScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// kept ProfileScreen for reference; primary tab uses FlightLookupScreen now
 const ProfileScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     <Text>Profile Screen</Text>
@@ -24,10 +25,19 @@ const ProfileScreen = () => (
 
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="HomeScreen" component={HomeScreen} />
+  </Stack.Navigator>
+);
+
+const BookFlightStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="SearchFlight" component={SearchFlightScreen} />
+    <Stack.Screen name="SearchResult" component={SearchResultScreen} />
+    <Stack.Screen name="ReturnFlightSelection" component={ReturnFlightSelectionScreen} />
     <Stack.Screen name="PassengerInfo" component={PassengerInfoScreen} />
     <Stack.Screen name="PaymentInfo" component={PaymentInfoScreen} />
     <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen} />
+    <Stack.Screen name="BookingConfirmation" component={require("../screens/BookingConfirmation").default} />
   </Stack.Navigator>
 );
 
@@ -46,16 +56,62 @@ const BottomTabs = () => (
       tabBarInactiveTintColor: "gray",
     })}
   >
-    <Tab.Screen name="Home" component={HomeStack} options={{ tabBarLabel: "Trang chủ" }} />
+    <Tab.Screen
+      name="Home"
+      component={HomeStack}
+      options={{
+        tabBarLabel: "Home",
+      }}
+    />
     <Tab.Screen
       name="BookFlight"
-      component={SearchFlightScreen}
+      component={BookFlightStack}
+      listeners={({ navigation, route }) => ({
+        tabPress: (e) => {
+          const state = navigation.getState();
+          const bookFlightRoute = state.routes.find((r: any) => r.name === "BookFlight");
+
+          // Check if BookFlight stack exists and has nested routes
+          if (bookFlightRoute?.state?.routes && bookFlightRoute.state.index !== undefined) {
+            const currentRoute = bookFlightRoute.state.routes[bookFlightRoute.state.index];
+
+            // If not on SearchFlight, reset to SearchFlight
+            if (currentRoute.name !== "SearchFlight") {
+              e.preventDefault();
+              (navigation as any).navigate("BookFlight", {
+                screen: "SearchFlight",
+              });
+            }
+          }
+        },
+      })}
+      options={({ route }) => {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? "SearchFlight";
+        // Hide tab bar for all screens in booking flow
+        const hideTabScreens = [
+          "SearchFlight",
+          "SearchResult",
+          "ReturnFlightSelection",
+          "PassengerInfo",
+          "PaymentInfo",
+          "PaymentMethod",
+          "BookingConfirmation",
+        ];
+
+        return {
+          tabBarLabel: "Book",
+          tabBarStyle: hideTabScreens.includes(routeName) ? { display: "none" } : undefined,
+        };
+      }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={FlightLookupScreen}
       options={{
-        tabBarLabel: "Đặt vé",
+        tabBarLabel: "Lookup",
         tabBarStyle: { display: "none" },
       }}
     />
-    <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Tài khoản" }} />
   </Tab.Navigator>
 );
 
@@ -63,9 +119,6 @@ const AppNavigator = () => (
   <NavigationContainer>
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={BottomTabs} />
-      <Stack.Screen name="SearchResult" component={SearchResultScreen} />
-      <Stack.Screen name="ReturnFlightSelection" component={ReturnFlightSelectionScreen} />
-      <Stack.Screen name="BookingConfirmation" component={require('../screens/BookingConfirmation').default} />
     </Stack.Navigator>
   </NavigationContainer>
 );

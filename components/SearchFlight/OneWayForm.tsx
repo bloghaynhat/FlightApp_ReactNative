@@ -38,8 +38,14 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
 
   const handleSearch = () => {
     if (fromCity && toCity && departDate) {
-      // Navigate to search results
-      navigation.navigate("SearchResult", {
+      // Validate that from and to cities are different
+      if (fromCity.id === toCity.id) {
+        alert("Departure and arrival airports must be different!");
+        return;
+      }
+
+      // Navigate to search results in BookFlight stack
+      (navigation as any).navigate("SearchResult", {
         fromAirportId: fromCity.id,
         toAirportId: toCity.id,
         departDate: departDate.toISOString().split("T")[0],
@@ -49,20 +55,16 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
     }
   };
 
-  const isFormValid = fromCity && toCity && departDate;
+  const isFormValid = fromCity && toCity && departDate && fromCity.id !== toCity.id;
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Tìm chuyến bay</Text>
-      </View>
-
       <View style={styles.formContainer}>
         <View style={styles.locationContainer}>
           {/* From Location */}
           <LocationInput
-            label="Từ"
-            placeholder="Chọn thành phố khởi hành"
+            label="POINT OF DEPARTURE"
+            placeholder="FROM"
             value={fromCity}
             onSelect={onFromCityChange}
             iconName=""
@@ -74,13 +76,7 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
           </TouchableOpacity>
 
           {/* To Location */}
-          <LocationInput
-            label="Đến"
-            placeholder="Chọn thành phố đến"
-            value={toCity}
-            onSelect={onToCityChange}
-            iconName=""
-          />
+          <LocationInput label="ARRIVAL" placeholder="TO" value={toCity} onSelect={onToCityChange} iconName="" />
         </View>
 
         {/* Divider */}
@@ -102,7 +98,7 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
         <TouchableOpacity style={styles.passengerInput}>
           <View style={styles.passengerContent}>
             <View>
-              <Text style={styles.passengerLabel}>Số hành khách</Text>
+              <Text style={styles.passengerLabel}>PASSENGER</Text>
               <View style={styles.passengerCounter}>
                 <TouchableOpacity
                   style={styles.counterButton}
@@ -119,7 +115,7 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
                 </TouchableOpacity>
               </View>
             </View>
-            <Ionicons name="person-outline" size={20} color="#666" />
+            <Ionicons name="person-outline" size={20} color="#fff" />
           </View>
         </TouchableOpacity>
 
@@ -129,7 +125,7 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
           onPress={handleSearch}
           disabled={!isFormValid}
         >
-          <Text style={styles.searchButtonText}>Tìm chuyến bay</Text>
+          <Text style={styles.searchButtonText}>Search Flights</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -141,48 +137,41 @@ export default OneWayForm;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 12,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#000",
   },
   formContainer: {
-    paddingHorizontal: 16,
     paddingVertical: 16,
+    marginTop: 16,
+    marginBottom: 32,
   },
   locationContainer: {
     position: "relative",
     height: "auto",
   },
   swapButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#f0f0f0",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
     right: 16,
     top: "50%",
-    transform: [{ translateY: -22 }],
+    transform: [{ translateY: -24 }],
     zIndex: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.4)",
   },
   divider: {
-    height: 1,
-    backgroundColor: "#eee",
-    marginVertical: 12,
+    height: 0,
+    marginVertical: 8,
   },
   passengerInput: {
-    padding: 10,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
+    padding: 14,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.4)",
   },
   passengerContent: {
     flexDirection: "row",
@@ -191,8 +180,11 @@ const styles = StyleSheet.create({
   },
   passengerLabel: {
     fontSize: 12,
-    color: "#666",
+    color: "#fff",
+    fontWeight: "700",
     marginBottom: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   passengerCounter: {
     flexDirection: "row",
@@ -203,28 +195,39 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "rgba(255, 255, 255, 0.4)",
   },
   passengerValue: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
     minWidth: 24,
     textAlign: "center",
   },
   searchButton: {
-    backgroundColor: "#0066cc",
+    backgroundColor: "#ffc400ff",
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: "center",
     marginTop: 16,
+    borderWidth: 1,
+    borderColor: "#0052a3",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   searchButtonDisabled: {
-    backgroundColor: "#ccc",
+    backgroundColor: "rgba(200, 200, 200, 0.7)",
+    borderColor: "rgba(150, 150, 150, 0.5)",
   },
   searchButtonText: {
     color: "#fff",

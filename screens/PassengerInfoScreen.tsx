@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import type { FlightResult } from "../apis/flightService";
-import type { Airport } from "../types";
+import PaymentHeader from "../components/Payment/PaymentHeader";
+import PriceSummary from "../components/PassengerInfo/PriceSummary";
+import PassengerForm from "../components/PassengerInfo/PassengerForm";
+import ContactForm from "../components/PassengerInfo/ContactForm";
+import DatePickerModal from "../components/PassengerInfo/DatePickerModal";
+import PriceDetailModal from "../components/PassengerInfo/PriceDetailModal";
 import type { RootStackParamList, PassengerData, ContactData } from "../types/types";
 
 type PassengerInfoScreenRouteProp = RouteProp<RootStackParamList, "PassengerInfo">;
@@ -17,8 +20,19 @@ type PassengerInfoScreenNavigationProp = NativeStackNavigationProp<RootStackPara
 const PassengerInfoScreen: React.FC = () => {
   const route = useRoute<PassengerInfoScreenRouteProp>();
   const navigation = useNavigation<PassengerInfoScreenNavigationProp>();
-  const { flight, outboundFlight, returnFlight, fromAirport, toAirport, departDate, returnDate, passengers, tripType } =
-    route.params;
+  const {
+    flight,
+    outboundFlight,
+    returnFlight,
+    fromAirport,
+    toAirport,
+    departDate,
+    returnDate,
+    passengers,
+    tripType,
+    selectedSeatClassId: initialSelectedSeatClassId,
+    selectedReturnSeatClassId: initialSelectedReturnSeatClassId,
+  } = route.params;
 
   // Get the appropriate flight(s) based on trip type
   const isRoundTrip = tripType === "roundTrip";
@@ -38,11 +52,16 @@ const PassengerInfoScreen: React.FC = () => {
     phone: "",
   });
 
-  const [selectedSeatClassId, setSelectedSeatClassId] = useState<string>(mainFlight?.seatClasses?.[0]?.id || "");
+  // State for Calendar Modal
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedPassengerIndex, setSelectedPassengerIndex] = useState<number | null>(null);
+  const [showPriceDetail, setShowPriceDetail] = useState(false);
 
-  const [selectedReturnSeatClassId, setSelectedReturnSeatClassId] = useState<string>(
-    isRoundTrip && returnFlight?.seatClasses?.[0]?.id ? returnFlight.seatClasses[0].id : ""
-  );
+  // Use seat class IDs from route params (already selected in SearchResult screen)
+  const selectedSeatClassId = initialSelectedSeatClassId || mainFlight?.seatClasses?.[0]?.id || "";
+  const selectedReturnSeatClassId =
+    initialSelectedReturnSeatClassId ||
+    (isRoundTrip && returnFlight?.seatClasses?.[0]?.id ? returnFlight.seatClasses[0].id : "");
 
   const updatePassenger = (index: number, field: keyof PassengerData, value: string) => {
     const newList = [...passengerList];
@@ -50,33 +69,74 @@ const PassengerInfoScreen: React.FC = () => {
     setPassengerList(newList);
   };
 
+  const openCalendar = (index: number) => {
+    setSelectedPassengerIndex(index);
+    setShowCalendar(true);
+  };
+
+  const handleDateSelect = (dateString: string) => {
+    if (selectedPassengerIndex !== null) {
+      // Convert from YYYY-MM-DD to DD/MM/YYYY
+      const [year, month, day] = dateString.split("-");
+      const formattedDate = `${day}/${month}/${year}`;
+      updatePassenger(selectedPassengerIndex, "birthDate", formattedDate);
+    }
+    setShowCalendar(false);
+    setSelectedPassengerIndex(null);
+  };
+
   const validateForm = (): boolean => {
     // Validate passengers
     for (let i = 0; i < passengerList.length; i++) {
       const passenger = passengerList[i];
       if (!passenger.firstName.trim() || !passenger.lastName.trim() || !passenger.birthDate.trim()) {
-        Alert.alert("Lỗi", `Vui lòng điền đầy đủ thông tin hành khách ${i + 1}`);
+        Alert.alert("Error", `Please fill in all information for passenger ${i + 1}`);
+        return false;
+      }
+
+      // Validate birth date format
+      const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+      const match = passenger.birthDate.match(dateRegex);
+      if (!match) {
+        Alert.alert("Error", `Birth date for passenger ${i + 1} is invalid. Please enter in DD/MM/YYYY format`);
+        return false;
+      }
+
+      const day = parseInt(match[1]);
+      const month = parseInt(match[2]);
+      const year = parseInt(match[3]);
+
+      // Validate date ranges
+      if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > new Date().getFullYear()) {
+        Alert.alert("Error", `Birth date for passenger ${i + 1} is invalid`);
+        return false;
+      }
+
+      // Validate date is not in future
+      const birthDate = new Date(year, month - 1, day);
+      if (birthDate > new Date()) {
+        Alert.alert("Error", `Birth date for passenger ${i + 1} cannot be in the future`);
         return false;
       }
     }
 
     // Validate contact
     if (!contact.email.trim() || !contact.phone.trim()) {
-      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin liên hệ");
+      Alert.alert("Error", "Please fill in all contact information");
       return false;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(contact.email)) {
-      Alert.alert("Lỗi", "Email không hợp lệ");
+      Alert.alert("Error", "Invalid email address");
       return false;
     }
 
     // Validate phone format
     const phoneRegex = /^[0-9]{10,11}$/;
     if (!phoneRegex.test(contact.phone)) {
-      Alert.alert("Lỗi", "Số điện thoại không hợp lệ (10-11 số)");
+      Alert.alert("Error", "Invalid phone number (10-11 digits)");
       return false;
     }
 
@@ -91,7 +151,12 @@ const PassengerInfoScreen: React.FC = () => {
     // Now PassengerInfo is in the same HomeStack as PaymentInfo,
     // so we can navigate directly by route name and pass params.
     navigation.navigate("PaymentInfo", {
-      flight,
+      // Ensure we pass the selected main flight (outbound) as `flight` so PaymentInfo
+      // always receives the outbound flight regardless of how this screen was reached.
+      flight: mainFlight,
+      // Also forward airport objects so PaymentInfo can display friendly names/codes
+      fromAirport,
+      toAirport,
       passengers: passengerList,
       contact,
       selectedSeatClassId,
@@ -103,14 +168,6 @@ const PassengerInfoScreen: React.FC = () => {
     } as any);
   };
 
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-  };
-
   const selectedSeatClass = mainFlight?.seatClasses?.find((sc) => sc.id === selectedSeatClassId);
   const selectedReturnSeatClass = isRoundTrip
     ? returnFlight?.seatClasses?.find((sc) => sc.id === selectedReturnSeatClassId)
@@ -118,176 +175,82 @@ const PassengerInfoScreen: React.FC = () => {
 
   const outboundPrice = selectedSeatClass ? selectedSeatClass.price * passengers : 0;
   const returnPrice = selectedReturnSeatClass ? selectedReturnSeatClass.price * passengers : 0;
-  const totalPrice = outboundPrice + returnPrice;
+
+  // Tính toán giá tổng bao gồm tất cả các phí
+  const baseFare = outboundPrice + returnPrice;
+  const systemAdminSurcharge = 220000; // Phụ thu hệ thống & quản trị
+  const passengerServiceCharge = 50000; // Phí phục vụ hành khách nội địa
+  const securityScreeningCharge = 10000; // Phí soi chiếu an ninh
+  const vat = Math.round((baseFare + systemAdminSurcharge + passengerServiceCharge + securityScreeningCharge) * 0.1); // 8% VAT
+  const totalPrice = baseFare + systemAdminSurcharge + passengerServiceCharge + securityScreeningCharge + vat;
 
   if (!mainFlight) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Không tìm thấy thông tin chuyến bay</Text>
+        <Text>Flight information not found</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thông tin hành khách</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+      <PaymentHeader title="Passenger details" currentStep={2} totalSteps={4} showBackButton={true} />
 
       <ScrollView style={styles.content}>
-        {/* Flight Summary - Outbound */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{isRoundTrip ? "Chuyến bay chiều đi" : "Thông tin chuyến bay"}</Text>
-          <View style={styles.flightSummary}>
-            <Text style={styles.flightRoute}>
-              {fromAirport.code} → {toAirport.code}
-            </Text>
-            <Text style={styles.flightDetails}>
-              {mainFlight.flightNumber} • {mainFlight.airline?.name}
-            </Text>
-            <Text style={styles.flightDate}>{new Date(departDate).toLocaleDateString("vi-VN")}</Text>
-          </View>
-        </View>
-
-        {/* Flight Summary - Return (for RoundTrip) */}
-        {isRoundTrip && returnFlight && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chuyến bay chiều về</Text>
-            <View style={styles.flightSummary}>
-              <Text style={styles.flightRoute}>
-                {toAirport.code} → {fromAirport.code}
-              </Text>
-              <Text style={styles.flightDetails}>
-                {returnFlight.flightNumber} • {returnFlight.airline?.name}
-              </Text>
-              <Text style={styles.flightDate}>
-                {returnDate ? new Date(returnDate).toLocaleDateString("vi-VN") : ""}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* Seat Class Selection - Outbound */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{isRoundTrip ? "Chọn hạng vé chiều đi" : "Chọn hạng vé"}</Text>
-          {mainFlight.seatClasses?.map((seatClass) => (
-            <TouchableOpacity
-              key={seatClass.id}
-              style={[styles.seatClassOption, selectedSeatClassId === seatClass.id && styles.seatClassSelected]}
-              onPress={() => setSelectedSeatClassId(seatClass.id)}
-            >
-              <View>
-                <Text style={styles.seatClassName}>{seatClass.className}</Text>
-                <Text style={styles.seatClassPrice}>{formatPrice(seatClass.price)}</Text>
-              </View>
-              {selectedSeatClassId === seatClass.id && <Ionicons name="checkmark-circle" size={24} color="#0066cc" />}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Seat Class Selection - Return (for RoundTrip) */}
-        {isRoundTrip && returnFlight && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chọn hạng vé chiều về</Text>
-            {returnFlight.seatClasses?.map((seatClass) => (
-              <TouchableOpacity
-                key={seatClass.id}
-                style={[styles.seatClassOption, selectedReturnSeatClassId === seatClass.id && styles.seatClassSelected]}
-                onPress={() => setSelectedReturnSeatClassId(seatClass.id)}
-              >
-                <View>
-                  <Text style={styles.seatClassName}>{seatClass.className}</Text>
-                  <Text style={styles.seatClassPrice}>{formatPrice(seatClass.price)}</Text>
-                </View>
-                {selectedReturnSeatClassId === seatClass.id && (
-                  <Ionicons name="checkmark-circle" size={24} color="#0066cc" />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        {/* Price Summary */}
+        <PriceSummary totalPrice={totalPrice} onShowDetail={() => setShowPriceDetail(true)} />
 
         {/* Passengers Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Thông tin hành khách</Text>
+          <Text style={styles.sectionTitle}>Passenger Information</Text>
           {passengerList.map((passenger, index) => (
-            <View key={index} style={styles.passengerCard}>
-              <Text style={styles.passengerLabel}>Hành khách {index + 1}</Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Họ và tên đệm"
-                value={passenger.lastName}
-                onChangeText={(text) => updatePassenger(index, "lastName", text)}
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Tên"
-                value={passenger.firstName}
-                onChangeText={(text) => updatePassenger(index, "firstName", text)}
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Ngày sinh (DD/MM/YYYY)"
-                value={passenger.birthDate}
-                onChangeText={(text) => updatePassenger(index, "birthDate", text)}
-              />
-            </View>
+            <PassengerForm
+              key={index}
+              passenger={passenger}
+              index={index}
+              onUpdate={(field, value) => updatePassenger(index, field, value)}
+              onOpenCalendar={() => openCalendar(index)}
+            />
           ))}
         </View>
 
         {/* Contact Info */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Thông tin liên hệ</Text>
-          <View style={styles.contactCard}>
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={contact.email}
-              onChangeText={(text) => setContact({ ...contact, email: text })}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Số điện thoại"
-              keyboardType="phone-pad"
-              value={contact.phone}
-              onChangeText={(text) => setContact({ ...contact, phone: text })}
-            />
-          </View>
-        </View>
-
-        {/* Price Summary */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Chi tiết giá</Text>
-          <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>
-              {passengers} x {selectedSeatClass?.className}
-            </Text>
-            <Text style={styles.priceValue}>{formatPrice(totalPrice)}</Text>
-          </View>
-          <View style={[styles.priceRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>Tổng cộng</Text>
-            <Text style={styles.totalValue}>{formatPrice(totalPrice)}</Text>
-          </View>
-        </View>
+        <ContactForm contact={contact} onUpdate={(field, value) => setContact({ ...contact, [field]: value })} />
       </ScrollView>
 
       {/* Continue Button */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Tiếp tục</Text>
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Calendar Modal */}
+      <DatePickerModal visible={showCalendar} onClose={() => setShowCalendar(false)} onDateSelect={handleDateSelect} />
+
+      {/* Price Detail Modal */}
+      {mainFlight && selectedSeatClass && (
+        <PriceDetailModal
+          visible={showPriceDetail}
+          onClose={() => setShowPriceDetail(false)}
+          mainFlight={mainFlight}
+          returnFlight={returnFlight}
+          fromAirport={fromAirport}
+          toAirport={toAirport}
+          departDate={departDate}
+          returnDate={returnDate}
+          passengers={passengers}
+          selectedSeatClass={selectedSeatClass}
+          selectedReturnSeatClass={selectedReturnSeatClass || undefined}
+          baseFare={baseFare}
+          systemAdminSurcharge={systemAdminSurcharge}
+          passengerServiceCharge={passengerServiceCharge}
+          securityScreeningCharge={securityScreeningCharge}
+          vat={vat}
+          totalPrice={totalPrice}
+          isRoundTrip={isRoundTrip}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -296,21 +259,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#000",
   },
   content: {
     flex: 1,
@@ -326,108 +274,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#000",
     marginBottom: 12,
-  },
-  flightSummary: {
-    padding: 12,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-  },
-  flightRoute: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000",
-    marginBottom: 4,
-  },
-  flightDetails: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 2,
-  },
-  flightDate: {
-    fontSize: 12,
-    color: "#999",
-  },
-  seatClassOption: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  seatClassSelected: {
-    borderColor: "#0066cc",
-    backgroundColor: "#f0f8ff",
-  },
-  seatClassName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 4,
-  },
-  seatClassPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#0066cc",
-  },
-  passengerCard: {
-    marginBottom: 16,
-    padding: 12,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-  },
-  passengerLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 12,
-  },
-  contactCard: {
-    padding: 12,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  priceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  priceLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  priceValue: {
-    fontSize: 14,
-    color: "#000",
-  },
-  totalRow: {
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    marginTop: 8,
-    paddingTop: 12,
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  totalValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#ff6b35",
   },
   footer: {
     padding: 16,
