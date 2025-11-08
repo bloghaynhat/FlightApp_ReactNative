@@ -12,10 +12,12 @@ import { View, Text } from "react-native";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import QRCodeScreen from "../screens/QRCodeScreen";
 import PaymentInfoScreen from "../screens/PaymentInfoScreen";
+import FlightLookupScreen from "../screens/FlightLookupScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// kept ProfileScreen for reference; primary tab uses FlightLookupScreen now
 const ProfileScreen = () => (
   <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
     <Text>Profile Screen</Text>
@@ -103,7 +105,7 @@ const BottomTabs = () => (
         };
       }}
     />
-    <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Tài khoản" }} />
+    <Tab.Screen name="Profile" component={FlightLookupScreen} options={{ tabBarLabel: "Tra cứu" }} />
   </Tab.Navigator>
 );
 
