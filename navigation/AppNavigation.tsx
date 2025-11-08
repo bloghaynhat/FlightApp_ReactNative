@@ -10,7 +10,6 @@ import ReturnFlightSelectionScreen from "../screens/ReturnFlightSelectionScreen"
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
-import QRCodeScreen from "../screens/QRCodeScreen";
 import PaymentInfoScreen from "../screens/PaymentInfoScreen";
 import FlightLookupScreen from "../screens/FlightLookupScreen";
 
