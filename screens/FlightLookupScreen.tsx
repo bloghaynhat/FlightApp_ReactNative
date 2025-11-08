@@ -10,10 +10,13 @@ import {
   ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import apiClient from "../apis/apiClient";
 import Ticket from "../components/Payment/Ticket";
 
 const FlightLookupScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingPassengerId, setBookingPassengerId] = useState("");
@@ -129,100 +132,264 @@ const FlightLookupScreen: React.FC = () => {
     <ImageBackground source={require("../assets/lookup.png")} style={{ flex: 1 }} imageStyle={{ resizeMode: "cover" }}>
       <View style={styles.overlay} />
       <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
-        <Text style={styles.title}>Flight Lookup</Text>
-
-        <Text style={{ marginBottom: 6, color: "#f3f4f6" }}>
-          Enter reservation number (bookingPassenger ID) to lookup. Example: BP01
-        </Text>
-        <TextInput
-          placeholder="Reservation Number (e.g. BP01)"
-          placeholderTextColor="#d1d5db"
-          style={styles.input}
-          value={bookingPassengerId}
-          onChangeText={setBookingPassengerId}
-        />
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#059669" }]}
-          onPress={searchByBookingPassenger}
-          disabled={loading}
-        >
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Search</Text>}
-        </TouchableOpacity>
-
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-
-        {bpResults && bpResults.length > 0 ? (
-          <FlatList
-            data={bpResults}
-            keyExtractor={(item, idx) => String(item.bp?.id ?? idx)}
-            renderItem={({ item }) => {
-              const bp = item.bp;
-              const seg = item.seg;
-              const flight = item.flight;
-              const passenger = item.passenger;
-              const seatClass = item.seatClass;
-              const fromAirport = item.fromAirport;
-              const toAirport = item.toAirport;
-              const passengerName = passenger ? `${passenger.lastName ?? ""} ${passenger.firstName ?? ""}`.trim() : "-";
-              const dep = flight?.departureTime ?? "";
-              const time = dep ? new Date(dep).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-              return (
-                <Ticket
-                  key={bp.id}
-                  fromCode={fromAirport?.code ?? flight?.fromAirportId ?? "---"}
-                  fromName={fromAirport?.city ?? fromAirport?.name}
-                  toCode={toAirport?.code ?? flight?.toAirportId ?? "---"}
-                  toName={toAirport?.city ?? toAirport?.name}
-                  passengerName={passengerName}
-                  flightNumber={flight?.flightNumber ?? ""}
-                  date={dep}
-                  time={time}
-                  seat={bp.seatNumber ?? ""}
-                  bookingCode={String(bp.id)}
-                  seatClass={seatClass?.className ?? ""}
-                />
-              );
-            }}
-          />
-        ) : (
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>{loading ? "Searching..." : "Enter reservation number to search"}</Text>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerTop}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.title}>Flight Lookup</Text>
+              <Text style={styles.subtitle}>Track your booking with reservation number</Text>
+            </View>
+            <TouchableOpacity style={styles.closeButton} onPress={() => navigation.navigate("Home" as never)}>
+              <Ionicons name="close" size={28} color="#fff" />
+            </TouchableOpacity>
           </View>
-        )}
+        </View>
+
+        {/* Search Card */}
+        <View style={styles.searchCard}>
+          <Text style={styles.label}>Reservation Number</Text>
+          <TextInput
+            placeholder="Enter your reservation number (e.g. BP01)"
+            placeholderTextColor="#9ca3af"
+            style={styles.input}
+            value={bookingPassengerId}
+            onChangeText={setBookingPassengerId}
+            autoCapitalize="characters"
+          />
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={searchByBookingPassenger}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <Text style={styles.buttonText}>Search Booking</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>⚠️ {error}</Text>
+          </View>
+        ) : null}
+
+        {/* Results Section */}
+        {bpResults && bpResults.length > 0 ? (
+          <View style={styles.resultsSection}>
+            <Text style={styles.resultsTitle}>Your Tickets</Text>
+            <FlatList
+              data={bpResults}
+              keyExtractor={(item, idx) => String(item.bp?.id ?? idx)}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.listContent}
+              renderItem={({ item }) => {
+                const bp = item.bp;
+                const seg = item.seg;
+                const flight = item.flight;
+                const passenger = item.passenger;
+                const seatClass = item.seatClass;
+                const fromAirport = item.fromAirport;
+                const toAirport = item.toAirport;
+                const passengerName = passenger
+                  ? `${passenger.lastName ?? ""} ${passenger.firstName ?? ""}`.trim()
+                  : "-";
+                const dep = flight?.departureTime ?? "";
+                const time = dep ? new Date(dep).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+                return (
+                  <Ticket
+                    key={bp.id}
+                    fromCode={fromAirport?.code ?? flight?.fromAirportId ?? "---"}
+                    fromName={fromAirport?.city ?? fromAirport?.name}
+                    toCode={toAirport?.code ?? flight?.toAirportId ?? "---"}
+                    toName={toAirport?.city ?? toAirport?.name}
+                    passengerName={passengerName}
+                    flightNumber={flight?.flightNumber ?? ""}
+                    date={dep}
+                    time={time}
+                    seat={bp.seatNumber ?? ""}
+                    bookingCode={String(bp.id)}
+                    seatClass={seatClass?.className ?? ""}
+                  />
+                );
+              }}
+            />
+          </View>
+        ) : !loading ? (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconContainer}>
+              <Text style={styles.emptyIcon}>✈️</Text>
+            </View>
+            <Text style={styles.emptyTitle}>No Bookings Yet</Text>
+            <Text style={styles.emptyText}>Enter your reservation number above to view your flight tickets</Text>
+          </View>
+        ) : null}
       </SafeAreaView>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.35)" },
-  container: { flex: 1, padding: 16, backgroundColor: "transparent" },
-  title: { fontSize: 20, fontWeight: "700", marginBottom: 12, color: "#fff" },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "transparent",
+  },
+  headerSection: {
+    marginBottom: 16,
+    marginTop: 0,
+  },
+  headerTop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#fff",
+    marginBottom: 6,
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#e5e7eb",
+    fontWeight: "500",
+  },
+  searchCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#374151",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
   input: {
-    backgroundColor: "rgba(255,255,255,0.95)",
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: "#f9fafb",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: "#e5e7eb",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  button: {
+    backgroundColor: "#0070BB",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    shadowColor: "#0070BB",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonDisabled: {
+    backgroundColor: "#93c5fd",
+    shadowOpacity: 0.1,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  errorContainer: {
+    backgroundColor: "rgba(239, 68, 68, 0.95)",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  resultsSection: {
+    flex: 1,
+    minHeight: 600,
+  },
+  resultsTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 12,
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  listContent: {
+    paddingBottom: 20,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 40,
+  },
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  emptyIcon: {
+    fontSize: 40,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#fff",
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
+    textAlign: "center",
   },
-  button: { backgroundColor: "#0066cc", padding: 12, borderRadius: 8, alignItems: "center", marginBottom: 12 },
-  buttonText: { color: "#fff", fontWeight: "700" },
-  card: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
+  emptyText: {
+    fontSize: 14,
+    color: "#d1d5db",
+    textAlign: "center",
+    lineHeight: 20,
   },
-  flight: { fontSize: 16, fontWeight: "800" },
-  status: { marginLeft: 8, color: "#6b7280" },
-  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  detail: { color: "#374151", marginTop: 6 },
-  empty: { padding: 24, alignItems: "center" },
-  emptyText: { color: "#e5e7eb" },
-  error: { color: "crimson", marginBottom: 8 },
 });
 
 export default FlightLookupScreen;

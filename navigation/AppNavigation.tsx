@@ -104,7 +104,14 @@ const BottomTabs = () => (
         };
       }}
     />
-    <Tab.Screen name="Profile" component={FlightLookupScreen} options={{ tabBarLabel: "Lookup" }} />
+    <Tab.Screen
+      name="Profile"
+      component={FlightLookupScreen}
+      options={{
+        tabBarLabel: "Lookup",
+        tabBarStyle: { display: "none" },
+      }}
+    />
   </Tab.Navigator>
 );
 
