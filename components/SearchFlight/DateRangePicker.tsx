@@ -146,9 +146,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   // Memoize modal title
   const modalTitle = useMemo(() => {
     if (mode === "single") {
-      return "Chọn ngày đi";
+      return "Select Departure Date";
     }
-    return selectingDepart ? "Chọn ngày đi" : "Chọn ngày về";
+    return selectingDepart ? "Select Departure Date" : "Select Return Date";
   }, [mode, selectingDepart]);
 
   // Memoize formatted dates
@@ -183,7 +183,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 <Text style={styles.dateDayOfWeek}>{formattedStartDate.dayOfWeek}</Text>
               </>
             ) : (
-              <Text style={styles.dateValue}>Chọn ngày</Text>
+              <Text style={styles.dateValue}>Select Date</Text>
             )}
           </View>
           <Ionicons name="calendar-outline" size={20} color="#fff" />
@@ -205,7 +205,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                   <Text style={styles.dateDayOfWeek}>{formattedEndDate.dayOfWeek}</Text>
                 </>
               ) : (
-                <Text style={styles.dateValue}>Chọn ngày</Text>
+                <Text style={styles.dateValue}>Select Date</Text>
               )}
             </View>
             <Ionicons name="calendar-outline" size={20} color="#fff" />
@@ -228,10 +228,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           />
           <View style={styles.buttonRow}>
             <TouchableOpacity onPress={handleCancel} style={[styles.button, styles.cancel]}>
-              <Text style={styles.buttonText}>Hủy</Text>
+              <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleConfirm()} style={[styles.button, styles.confirm]}>
-              <Text style={[styles.buttonText, { color: "#fff" }]}>Xác nhận</Text>
+              <Text style={[styles.buttonText, { color: "#fff" }]}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>

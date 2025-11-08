@@ -25,19 +25,19 @@ const PAYMENT_METHODS: PaymentMethodOption[] = [
     id: "momo",
     label: "Momo",
     icon: "wallet-outline",
-    description: "Ví điện tử Momo",
+    description: "Momo E-wallet",
     color: "#FF6B35",
   },
   {
     id: "vnpay",
     label: "VNPay",
     icon: "credit-card",
-    description: "Thẻ ngân hàng",
+    description: "Bank Card",
     color: "#0066CC",
   },
   {
     id: "credit_card",
-    label: "Thẻ tín dụng",
+    label: "Credit Card",
     icon: "card-outline",
     description: "Visa, Mastercard",
     color: "#1E40AF",
@@ -103,8 +103,8 @@ const PaymentMethodScreen: React.FC = () => {
           if (!result.ok) {
             setLoading(false);
             Alert.alert(
-              "Không đủ ghế",
-              `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedSeatClassId}. Vui lòng chọn hạng khác hoặc giảm số hành khách.`
+              "Insufficient Seats",
+              `Only ${result.available} seats available in class ${bookingPayload.selectedSeatClassId}. Please choose another class or reduce the number of passengers.`
             );
             return;
           }
@@ -114,8 +114,8 @@ const PaymentMethodScreen: React.FC = () => {
           if (!result.ok) {
             setLoading(false);
             Alert.alert(
-              "Không đủ ghế",
-              `Chỉ còn ${result.available} ghế trống trong hạng ${bookingPayload.selectedReturnSeatClassId} (chiều về). Vui lòng chọn hạng khác hoặc giảm số hành khách.`
+              "Insufficient Seats",
+              `Only ${result.available} seats available in class ${bookingPayload.selectedReturnSeatClassId} (return flight). Please choose another class or reduce the number of passengers.`
             );
             return;
           }
@@ -186,24 +186,24 @@ const PaymentMethodScreen: React.FC = () => {
         return;
       }
       setLoading(false);
-      Alert.alert("Thanh toán", `Thanh toán thành công. Mã xác nhận: ${confirmationCode}`);
+      Alert.alert("Payment", `Payment successful. Confirmation code: ${confirmationCode}`);
       navigation.navigate("BookingConfirmation", { booking: resp.data, segments: [] });
     } catch (error) {
       setLoading(false);
       console.error("Create booking error", error);
-      Alert.alert("Lỗi", "Không thể tạo BookingOrder. Vui lòng thử lại.");
+      Alert.alert("Error", "Unable to create booking order. Please try again.");
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <PaymentHeader title="Payment method" currentStep={4} totalSteps={4} showBackButton={true} />
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {/* Title */}
         <View style={styles.titleSection}>
-          <Text style={styles.title}>Chọn phương thức thanh toán</Text>
-          <Text style={styles.subtitle}>Lựa chọn cách thanh toán phù hợp cho bạn</Text>
+          <Text style={styles.title}>Select Payment Method</Text>
+          <Text style={styles.subtitle}>Choose the payment method that suits you</Text>
         </View>
 
         {/* Payment Methods */}
@@ -233,11 +233,11 @@ const PaymentMethodScreen: React.FC = () => {
         {/* Amount Summary */}
         <View style={styles.summarySection}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Tổng tiền:</Text>
+            <Text style={styles.summaryLabel}>Total Amount:</Text>
             <Text style={styles.summaryValue}>{(bookingPayload?.grandTotal ?? 0).toLocaleString("vi-VN")} VND</Text>
           </View>
           <View style={styles.summaryDivider} />
-          <Text style={styles.securityText}>🔒 Thanh toán được bảo mật 100%</Text>
+          <Text style={styles.securityText}>🔒 100% Secure Payment</Text>
         </View>
 
         {/* Payment Button */}
@@ -254,7 +254,7 @@ const PaymentMethodScreen: React.FC = () => {
           >
             <TouchableOpacity onPress={handleProceedToPayment} style={styles.paymentButton}>
               <MaterialCommunityIcons name="check-circle" size={20} color="white" />
-              <Text style={styles.paymentButtonText}>Tiến hành thanh toán</Text>
+              <Text style={styles.paymentButtonText}>Proceed to Payment</Text>
             </TouchableOpacity>
           </LinearGradient>
         )}

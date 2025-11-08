@@ -10,7 +10,6 @@ import ReturnFlightSelectionScreen from "../screens/ReturnFlightSelectionScreen"
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text } from "react-native";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
-import QRCodeScreen from "../screens/QRCodeScreen";
 import PaymentInfoScreen from "../screens/PaymentInfoScreen";
 import FlightLookupScreen from "../screens/FlightLookupScreen";
 
@@ -61,7 +60,7 @@ const BottomTabs = () => (
       name="Home"
       component={HomeStack}
       options={{
-        tabBarLabel: "Trang chủ",
+        tabBarLabel: "Home",
       }}
     />
     <Tab.Screen
@@ -88,7 +87,7 @@ const BottomTabs = () => (
       })}
       options={({ route }) => {
         const routeName = getFocusedRouteNameFromRoute(route) ?? "SearchFlight";
-        // Ẩn tab bar cho tất cả các màn hình trong booking flow
+        // Hide tab bar for all screens in booking flow
         const hideTabScreens = [
           "SearchFlight",
           "SearchResult",
@@ -100,12 +99,19 @@ const BottomTabs = () => (
         ];
 
         return {
-          tabBarLabel: "Đặt vé",
+          tabBarLabel: "Book",
           tabBarStyle: hideTabScreens.includes(routeName) ? { display: "none" } : undefined,
         };
       }}
     />
-    <Tab.Screen name="Profile" component={FlightLookupScreen} options={{ tabBarLabel: "Tra cứu" }} />
+    <Tab.Screen
+      name="Profile"
+      component={FlightLookupScreen}
+      options={{
+        tabBarLabel: "Lookup",
+        tabBarStyle: { display: "none" },
+      }}
+    />
   </Tab.Navigator>
 );
 

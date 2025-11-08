@@ -125,7 +125,7 @@ const OneWayForm: React.FC<OneWayFormProps> = ({
           onPress={handleSearch}
           disabled={!isFormValid}
         >
-          <Text style={styles.searchButtonText}>Tìm chuyến bay</Text>
+          <Text style={styles.searchButtonText}>Search Flights</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

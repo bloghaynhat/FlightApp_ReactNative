@@ -477,6 +477,46 @@
       "phoneContact": "0914462297",
       "paymentMethod": "momo",
       "status": "Confirmed"
+    },
+    {
+      "id": "BO1762616621686",
+      "confirmationCode": "ZV3GVZ",
+      "totalPrice": 2950000,
+      "bookingDate": "2025-11-08T15:43:41.686Z",
+      "emailContact": "duc@gmail.com",
+      "phoneContact": "09123456789",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
+    },
+    {
+      "id": "BO1762617739720",
+      "confirmationCode": "OAKU00",
+      "totalPrice": 3553000,
+      "bookingDate": "2025-11-08T16:02:19.720Z",
+      "emailContact": "duc@gmail.com",
+      "phoneContact": "09123456789",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
+    },
+    {
+      "id": "BO1762618590868",
+      "confirmationCode": "KECZE6",
+      "totalPrice": 3553000,
+      "bookingDate": "2025-11-08T16:16:30.868Z",
+      "emailContact": "duc@gmail.com",
+      "phoneContact": "09123456789",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
+    },
+    {
+      "id": "BO1762619465218",
+      "confirmationCode": "J9TOLY",
+      "totalPrice": 3553000,
+      "bookingDate": "2025-11-08T16:31:05.218Z",
+      "emailContact": "duc@gmail.com",
+      "phoneContact": "09123456789",
+      "paymentMethod": "momo",
+      "status": "Confirmed"
     }
   ],
   "bookingSegments": [
@@ -655,6 +695,78 @@
       "seatClassId": "SC12",
       "numSeats": 2,
       "status": "Confirmed"
+    },
+    {
+      "id": "0652",
+      "bookingOrderId": "BO1762616621686",
+      "flightId": "F001",
+      "leg": "outbound",
+      "seatClassId": "SC01",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "ab39",
+      "bookingOrderId": "BO1762616621686",
+      "flightId": "F008",
+      "leg": "return",
+      "seatClassId": "SC12",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "8003",
+      "bookingOrderId": "BO1762617739720",
+      "flightId": "F001",
+      "leg": "outbound",
+      "seatClassId": "SC01",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "e11c",
+      "bookingOrderId": "BO1762617739720",
+      "flightId": "F008",
+      "leg": "return",
+      "seatClassId": "SC12",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "d37d",
+      "bookingOrderId": "BO1762618590868",
+      "flightId": "F001",
+      "leg": "outbound",
+      "seatClassId": "SC01",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "f224",
+      "bookingOrderId": "BO1762618590868",
+      "flightId": "F008",
+      "leg": "return",
+      "seatClassId": "SC12",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "90af",
+      "bookingOrderId": "BO1762619465218",
+      "flightId": "F001",
+      "leg": "outbound",
+      "seatClassId": "SC01",
+      "numSeats": 1,
+      "status": "Confirmed"
+    },
+    {
+      "id": "b79d",
+      "bookingOrderId": "BO1762619465218",
+      "flightId": "F008",
+      "leg": "return",
+      "seatClassId": "SC12",
+      "numSeats": 1,
+      "status": "Confirmed"
     }
   ],
   "passengers": [
@@ -783,6 +895,30 @@
       "firstName": "bbbb",
       "lastName": "bbbb",
       "birthDate": "04/11/2025"
+    },
+    {
+      "id": "5304",
+      "firstName": "Duc",
+      "lastName": "Duc",
+      "birthDate": "07/11/2025"
+    },
+    {
+      "id": "58f2",
+      "firstName": "Duc",
+      "lastName": "Duc",
+      "birthDate": "07/11/2025"
+    },
+    {
+      "id": "db83",
+      "firstName": "Duc",
+      "lastName": "Duc",
+      "birthDate": "07/11/2025"
+    },
+    {
+      "id": "e47f",
+      "firstName": "Duc",
+      "lastName": "Minh",
+      "birthDate": "21/08/2004"
     }
   ],
   "bookingPassengers": [
@@ -954,6 +1090,54 @@
       "id": "327b",
       "bookingSegmentId": "252f",
       "passengerId": "e939",
+      "seatNumber": null
+    },
+    {
+      "id": "2b3e",
+      "bookingSegmentId": "0652",
+      "passengerId": "5304",
+      "seatNumber": null
+    },
+    {
+      "id": "d788",
+      "bookingSegmentId": "ab39",
+      "passengerId": "5304",
+      "seatNumber": null
+    },
+    {
+      "id": "6916",
+      "bookingSegmentId": "8003",
+      "passengerId": "58f2",
+      "seatNumber": null
+    },
+    {
+      "id": "601c",
+      "bookingSegmentId": "e11c",
+      "passengerId": "58f2",
+      "seatNumber": null
+    },
+    {
+      "id": "73c3",
+      "bookingSegmentId": "d37d",
+      "passengerId": "db83",
+      "seatNumber": null
+    },
+    {
+      "id": "ed33",
+      "bookingSegmentId": "f224",
+      "passengerId": "db83",
+      "seatNumber": null
+    },
+    {
+      "id": "0709",
+      "bookingSegmentId": "90af",
+      "passengerId": "e47f",
+      "seatNumber": null
+    },
+    {
+      "id": "8c10",
+      "bookingSegmentId": "b79d",
+      "passengerId": "e47f",
       "seatNumber": null
     }
   ]
