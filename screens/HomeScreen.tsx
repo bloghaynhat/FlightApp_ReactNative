@@ -101,9 +101,18 @@ const HomeScreen: React.FC = () => {
   const handleBuyTicket = async (airportId: string) => {
     try {
       const airport = await airportService.getAirportById(airportId);
-      navigation.navigate("BookFlight", {
-        preSelectedDestination: airport,
+      // Navigate to BookFlight tab with pre-selected destination
+      navigation.navigate("MainTabs", {
+        screen: "BookFlight",
+        params: {
+          screen: "SearchFlight",
+          params: {
+            preSelectedDestination: airport,
+          },
+        },
       });
+      // Close modal after navigation
+      setModalVisible(false);
     } catch (error) {
       console.error("Error loading airport:", error);
     }

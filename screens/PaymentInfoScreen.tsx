@@ -1,19 +1,20 @@
-import React from "react"
-import { useState } from "react"
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Button } from "react-native"
-import { LinearGradient } from "expo-linear-gradient"
-import type { RootStackParamList } from "../types/types"
-import type { StackNavigationProp } from "@react-navigation/stack"
-import { MaterialCommunityIcons } from "@expo/vector-icons"
-import PaymentHeader from "../components/Payment/PaymentHeader"
-import { RouteProp, useRoute } from "@react-navigation/native"
-import { FlightResult } from "../apis/flightService"
-import { Airport } from "../types"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import React from "react";
+import { useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Button } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import type { RootStackParamList } from "../types/types";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import PaymentHeader from "../components/Payment/PaymentHeader";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { FlightResult } from "../apis/flightService";
+import { Airport } from "../types";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type PaymentInfoScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "PaymentInfo">;
 interface Props {
-    navigation: PaymentInfoScreenNavigationProp
+    navigation: PaymentInfoScreenNavigationProp;
 }
 
 const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
@@ -31,18 +32,28 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
         tripType,
     } = (params ?? {}) as NonNullable<RootStackParamList["PaymentInfo"]>;
 
-    const [showFlightInfo, setShowFlightInfo] = useState(false)
-    const [showPriceDetails, setShowPriceDetails] = useState(false)
-    const [showPassengerInfo, setShowPassengerInfo] = useState(false)
+    const [showFlightInfo, setShowFlightInfo] = useState(false);
+    const [showPriceDetails, setShowPriceDetails] = useState(false);
+    const [showPassengerInfo, setShowPassengerInfo] = useState(false);
 
     // Interpret incoming params
     const passengerList = Array.isArray(passengers) ? (passengers as any[]) : undefined;
-    const passengerCount = passengerList ? passengerList.length : typeof passengers === 'number' ? (passengers as number) : 1;
+    const passengerCount = passengerList
+        ? passengerList.length
+        : typeof passengers === "number"
+            ? (passengers as number)
+            : 1;
 
     const getSeatClassPrice = (f: any, seatClassId?: string) => {
         if (!f || !f.seatClasses) return 0;
         const sc = seatClassId ? f.seatClasses.find((s: any) => s.id === seatClassId) : f.seatClasses[0];
         return sc ? sc.price || 0 : 0;
+    };
+
+    const getSeatClassName = (f: any, seatClassId?: string) => {
+        if (!f || !f.seatClasses) return "-";
+        const sc = seatClassId ? f.seatClasses.find((s: any) => s.id === seatClassId) : f.seatClasses[0];
+        return sc ? sc.className || sc.name || "-" : "-";
     };
 
     const outboundPricePerPassenger = getSeatClassPrice(flight as any, selectedSeatClassId);
@@ -51,13 +62,16 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
     const returnTotal = returnPricePerPassenger * passengerCount;
     const grandTotal = outboundTotal + returnTotal;
 
-    const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    const formatPrice = (price: number) =>
+        new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 
     const handleProceedToPayment = () => {
         // Pass booking payload to PaymentMethod so it can create the BookingOrder after payment
-        navigation.navigate('PaymentMethod', {
+        navigation.navigate("PaymentMethod", {
             bookingPayload: {
-                flight,
+                // include both outbound and return flight objects so PaymentMethod can create segments for both legs
+                outboundFlight: flight,
+                returnFlight: returnFlight,
                 passengers: passengerList ?? passengerCount,
                 contact,
                 selectedSeatClassId,
@@ -71,22 +85,9 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
     };
 
     return (
-        <View style={styles.container}>
-            {/* Top back button so user can return to PassengerInfo to edit */}
-            <View style={styles.topNav}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <MaterialCommunityIcons name="arrow-left" size={22} color="#1f2937" />
-                    <Text style={styles.backButtonText}>Chỉnh sửa hành khách</Text>
-                </TouchableOpacity>
-            </View>
-            <ScrollView
-                style={styles.container}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollContent}
-            >
-                {/* Header */}
-                <PaymentHeader title="Thanh toán" currentStep={2} totalSteps={4} />
-
+        <SafeAreaView style={styles.container}>
+            <PaymentHeader title="Payment confirmation" currentStep={3} totalSteps={4} showBackButton={true} />
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
                 {/* Total Amount Section - Gradient Background */}
                 <LinearGradient
                     colors={["#0070BB", "#0070BB"]}
@@ -107,10 +108,58 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
                     accentColor="#9333ea"
                 >
                     <PaymentDetailRow label="Flight Number" value={flight?.flightNumber ?? "-"} />
-                    <PaymentDetailRow label="Khởi hành" value={flight?.departureTime ? new Date(flight.departureTime).toLocaleString() : "-"} />
-                    <PaymentDetailRow label="Đến nơi" value={flight?.arrivalTime ? new Date(flight.arrivalTime).toLocaleString() : "-"} />
-                    <PaymentDetailRow label="Từ" value={params?.fromAirport ? `${params.fromAirport.code} (${params.fromAirport.name})` : (flight?.fromAirportId ?? "-")} />
-                    <PaymentDetailRow label="Đến" value={params?.toAirport ? `${params.toAirport.code} (${params.toAirport.name})` : (flight?.toAirportId ?? "-")} isLast />
+                    <PaymentDetailRow
+                        label="Khởi hành"
+                        value={flight?.departureTime ? new Date(flight.departureTime).toLocaleString() : "-"}
+                    />
+                    <PaymentDetailRow
+                        label="Đến nơi"
+                        value={flight?.arrivalTime ? new Date(flight.arrivalTime).toLocaleString() : "-"}
+                    />
+                    <PaymentDetailRow
+                        label="Từ"
+                        value={
+                            params?.fromAirport
+                                ? `${params.fromAirport.code} (${params.fromAirport.name})`
+                                : flight?.fromAirportId ?? "-"
+                        }
+                    />
+                    <PaymentDetailRow
+                        label="Đến"
+                        value={
+                            params?.toAirport ? `${params.toAirport.code} (${params.toAirport.name})` : flight?.toAirportId ?? "-"
+                        }
+                        isLast
+                    />
+
+                    {/* If round-trip, show return flight brief info (sourced from PassengerInfo) */}
+                    {tripType === "roundTrip" && returnFlight && (
+                        <>
+                            <PaymentDetailRow label="Flight Number (chiều về)" value={returnFlight?.flightNumber ?? "-"} />
+                            <PaymentDetailRow
+                                label="Khởi hành (chiều về)"
+                                value={returnFlight?.departureTime ? new Date(returnFlight.departureTime).toLocaleString() : "-"}
+                            />
+                            <PaymentDetailRow
+                                label="Đến nơi (chiều về)"
+                                value={returnFlight?.arrivalTime ? new Date(returnFlight.arrivalTime).toLocaleString() : "-"}
+                            />
+                            <PaymentDetailRow
+                                label="Từ (chiều về)"
+                                value={
+                                    // for return flight, airports are swapped: try params.toAirport (original destination) then fallback to ids
+                                    params?.toAirport ? `${params.toAirport.code} (${params.toAirport.name})` : returnFlight?.fromAirportId ?? "-"
+                                }
+                            />
+                            <PaymentDetailRow
+                                label="Đến (chiều về)"
+                                value={
+                                    params?.fromAirport ? `${params.fromAirport.code} (${params.fromAirport.name})` : returnFlight?.toAirportId ?? "-"
+                                }
+                            />
+                            <PaymentDetailRow label="Hạng vé (chiều về)" value={getSeatClassName(returnFlight as any, selectedReturnSeatClassId)} isLast />
+                        </>
+                    )}
                 </CollapsibleCard>
 
                 {/* Price Details Card */}
@@ -122,7 +171,9 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
                     accentColor="#6366f1"
                 >
                     <PaymentDetailRow label="Giá vé (1 hành khách) - Chiều đi" value={formatPrice(outboundPricePerPassenger)} />
-                    {tripType === "roundTrip" && <PaymentDetailRow label="Giá vé (1 hành khách) - Chiều về" value={formatPrice(returnPricePerPassenger)} />}
+                    {tripType === "roundTrip" && (
+                        <PaymentDetailRow label="Giá vé (1 hành khách) - Chiều về" value={formatPrice(returnPricePerPassenger)} />
+                    )}
                     <PaymentDetailRow label="Số hành khách" value={`${passengerCount}`} />
                     <PaymentDetailRow label="Tổng (chiều đi)" value={formatPrice(outboundTotal)} />
                     {tripType === "roundTrip" && <PaymentDetailRow label="Tổng (chiều về)" value={formatPrice(returnTotal)} />}
@@ -147,6 +198,17 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
                     <PaymentDetailRow label="SĐT liên hệ" value={contact?.phone ?? "-"} isLast />
                 </CollapsibleCard>
 
+                {/* Total Amount Card */}
+                <LinearGradient
+                    colors={["#0070BB", "#0070BB"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.totalAmountCard}
+                >
+                    <Text style={styles.totalAmountLabel}>Tổng tiền thanh toán</Text>
+                    <Text style={styles.totalAmount}>{formatPrice(grandTotal)}</Text>
+                </LinearGradient>
+
                 <LinearGradient
                     colors={["#0070BB", "#0070BB"]}
                     start={{ x: 0, y: 0 }}
@@ -158,20 +220,20 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
                     </TouchableOpacity>
                 </LinearGradient>
             </ScrollView>
-        </View>
-    )
-}
+        </SafeAreaView>
+    );
+};
 
 /**
  * Collapsible card component for payment details
  */
 interface CollapsibleCardProps {
-    icon: React.ComponentProps<typeof MaterialCommunityIcons>['name']
-    title: string
-    isOpen: boolean
-    onToggle: () => void
-    accentColor: string
-    children: React.ReactNode
+    icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+    title: string;
+    isOpen: boolean;
+    onToggle: () => void;
+    accentColor: string;
+    children: React.ReactNode;
 }
 
 const CollapsibleCard = ({
@@ -193,15 +255,15 @@ const CollapsibleCard = ({
 
         {isOpen && <View style={styles.cardContent}>{children}</View>}
     </TouchableOpacity>
-)
+);
 
 /**
  * Payment detail row component
  */
 interface PaymentDetailRowProps {
-    label: string
-    value: string
-    isLast?: boolean
+    label: string;
+    value: string;
+    isLast?: boolean;
 }
 
 const PaymentDetailRow = ({ label, value, isLast = false }: PaymentDetailRowProps): React.ReactElement => (
@@ -209,7 +271,7 @@ const PaymentDetailRow = ({ label, value, isLast = false }: PaymentDetailRowProp
         <Text style={styles.detailLabel}>{label}</Text>
         <Text style={styles.detailValue}>{value}</Text>
     </View>
-)
+);
 
 const styles = StyleSheet.create({
     container: {
@@ -221,8 +283,8 @@ const styles = StyleSheet.create({
     },
     totalAmountCard: {
         marginHorizontal: 16,
-        marginTop: 20,
-        marginBottom: 24,
+        marginTop: 8,
+        marginBottom: 16,
         paddingVertical: 24,
         paddingHorizontal: 20,
         borderRadius: 10,
@@ -322,23 +384,6 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         marginTop: 8,
     },
-    topNav: {
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 6,
-        backgroundColor: 'transparent',
-    },
-    backButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    backButtonText: {
-        marginLeft: 8,
-        fontSize: 14,
-        color: '#1f2937',
-        fontWeight: '600',
-    },
-})
+});
 
-export default PaymentInfoScreen
+export default PaymentInfoScreen;
