@@ -59,13 +59,15 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
 
         <View style={styles.infoItem}>
           <Ionicons name="person-outline" size={14} color="#666" />
-          <Text style={styles.infoText}>{passengers} hành khách</Text>
+          <Text style={styles.infoText}>
+            {passengers} {passengers === 1 ? "passenger" : "passengers"}
+          </Text>
         </View>
       </View>
 
       {onModify && (
         <TouchableOpacity style={styles.modifyButton} onPress={onModify}>
-          <Text style={styles.modifyText}>Thay đổi</Text>
+          <Text style={styles.modifyText}>Modify</Text>
         </TouchableOpacity>
       )}
     </View>

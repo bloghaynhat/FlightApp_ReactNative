@@ -9,7 +9,7 @@ import { LoadingState } from "../components/SearchResult/LoadingState";
 import { EmptyState } from "../components/SearchResult/EmptyState";
 import PaymentHeader from "../components/Payment/PaymentHeader";
 import type { Airport } from "../types";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type RootStackParamList = {
   SearchResult: {
@@ -28,6 +28,7 @@ type SearchResultScreenNavigationProp = NativeStackNavigationProp<RootStackParam
 const SearchResultScreen: React.FC = () => {
   const route = useRoute<SearchResultScreenRouteProp>();
   const navigation = useNavigation<SearchResultScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
   const { fromAirportId, toAirportId, departDate, returnDate, passengers, tripType } = route.params;
 
   const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ const SearchResultScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <PaymentHeader
         title="Select flight"
         currentStep={1}
@@ -161,7 +162,7 @@ const SearchResultScreen: React.FC = () => {
 
           {/* Global Continue Button */}
           {selectedFlight && selectedSeatClassId && (
-            <View style={styles.continueContainer}>
+            <View style={[styles.continueContainer, { paddingBottom: 12 + insets.bottom }]}>
               <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
                 <Text style={styles.continueButtonText}>Continue</Text>
               </TouchableOpacity>
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#fff",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: "#e5e5e5",
     shadowColor: "#000",

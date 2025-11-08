@@ -10,7 +10,7 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { FlightResult } from "../apis/flightService";
 import { Airport } from "../types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PaymentInfoScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "PaymentInfo">;
 interface Props {
@@ -19,6 +19,7 @@ interface Props {
 
 const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
   const route = useRoute<RouteProp<RootStackParamList, "PaymentInfo">>();
+  const insets = useSafeAreaInsets();
   const params = route.params;
   const {
     flight,
@@ -98,7 +99,7 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <PaymentHeader title="Payment confirmation" currentStep={3} totalSteps={4} showBackButton={true} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Flight Info Card */}
@@ -314,7 +315,7 @@ const PaymentInfoScreen = ({ navigation }: Props): React.ReactElement => {
       </ScrollView>
 
       {/* Fixed Bottom Section - Total and Payment Button */}
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: 16 + insets.bottom }]}>
         <View style={styles.totalSummaryContainer}>
           <Text style={styles.totalLabelText}>Total:</Text>
           <Text style={styles.totalAmountText}>{formatPrice(grandTotal)}</Text>
@@ -399,7 +400,6 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#fff",
     paddingTop: 12,
-    paddingBottom: 16,
     paddingHorizontal: 16,
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",

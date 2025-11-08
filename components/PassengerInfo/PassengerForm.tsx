@@ -32,18 +32,18 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ passenger, index, onUpdat
 
   return (
     <View style={styles.passengerCard}>
-      <Text style={styles.passengerLabel}>Hành khách {index + 1}</Text>
+      <Text style={styles.passengerLabel}>Passenger {index + 1}</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Họ và tên đệm"
+        placeholder="Last Name"
         value={passenger.lastName}
         onChangeText={(text) => onUpdate("lastName", text)}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Tên"
+        placeholder="First Name"
         value={passenger.firstName}
         onChangeText={(text) => onUpdate("firstName", text)}
       />
@@ -51,7 +51,7 @@ const PassengerForm: React.FC<PassengerFormProps> = ({ passenger, index, onUpdat
       <View style={styles.dateInputContainer}>
         <TextInput
           style={styles.dateInput}
-          placeholder="Ngày sinh (DD/MM/YYYY)"
+          placeholder="Date of Birth (DD/MM/YYYY)"
           value={passenger.birthDate}
           onChangeText={formatBirthDate}
           keyboardType="numeric"

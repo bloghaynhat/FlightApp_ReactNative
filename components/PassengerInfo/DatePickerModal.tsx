@@ -15,7 +15,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({ visible, onClose, onD
       <View style={styles.modalOverlay}>
         <View style={styles.calendarContainer}>
           <View style={styles.calendarHeader}>
-            <Text style={styles.calendarTitle}>Chọn ngày sinh</Text>
+            <Text style={styles.calendarTitle}>Select Date of Birth</Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close" size={28} color="#333" />
             </TouchableOpacity>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { flightService, FlightResult } from "../apis/flightService";
 import { airportService } from "../apis/airportService";
 import { FlightCard } from "../components/SearchResult/FlightCard";
@@ -31,6 +31,7 @@ type ReturnFlightSelectionNavigationProp = NativeStackNavigationProp<RootStackPa
 const ReturnFlightSelectionScreen: React.FC = () => {
   const route = useRoute<ReturnFlightSelectionRouteProp>();
   const navigation = useNavigation<ReturnFlightSelectionNavigationProp>();
+  const insets = useSafeAreaInsets();
   const {
     outboundFlight,
     fromAirportId,
@@ -115,7 +116,7 @@ const ReturnFlightSelectionScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <PaymentHeader title="Select return flight" currentStep={1} totalSteps={4} showBackButton={true} />
 
       {/* Selected Outbound Flight Banner */}
@@ -124,17 +125,17 @@ const ReturnFlightSelectionScreen: React.FC = () => {
           <Ionicons name="checkmark-circle" size={24} color="#00aa00" />
         </View>
         <View style={styles.bannerContent}>
-          <Text style={styles.bannerTitle}>Chuyến bay chiều đi đã chọn</Text>
+          <Text style={styles.bannerTitle}>Selected Outbound Flight</Text>
           <Text style={styles.bannerText}>
             {outboundFlight.flightNumber} • {outboundFlight.airline?.name}
           </Text>
-          <Text style={styles.bannerDate}>{new Date(departDate).toLocaleDateString("vi-VN")}</Text>
+          <Text style={styles.bannerDate}>{new Date(departDate).toLocaleDateString("en-US")}</Text>
         </View>
       </View>
 
       {/* Return Flights List */}
       {flights.length === 0 ? (
-        <EmptyState message="Không tìm thấy chuyến bay chiều về phù hợp" />
+        <EmptyState message="No return flights found" />
       ) : (
         <>
           <FlatList
@@ -154,7 +155,7 @@ const ReturnFlightSelectionScreen: React.FC = () => {
 
           {/* Global Continue Button */}
           {selectedReturnFlight && selectedReturnSeatClassId && (
-            <View style={styles.continueContainer}>
+            <View style={[styles.continueContainer, { paddingBottom: 12 + insets.bottom }]}>
               <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
                 <Text style={styles.continueButtonText}>Continue</Text>
               </TouchableOpacity>
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#fff",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: "#e5e5e5",
     shadowColor: "#000",

@@ -193,7 +193,7 @@ const PassengerInfoScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <PaymentHeader title="Passenger details" currentStep={2} totalSteps={4} showBackButton={true} />
 
       <ScrollView style={styles.content}>

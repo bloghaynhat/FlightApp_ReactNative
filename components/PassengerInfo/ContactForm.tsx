@@ -10,7 +10,7 @@ interface ContactFormProps {
 const ContactForm: React.FC<ContactFormProps> = ({ contact, onUpdate }) => {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Thông tin liên hệ</Text>
+      <Text style={styles.sectionTitle}>Contact Information</Text>
       <View style={styles.contactCard}>
         <TextInput
           style={styles.input}
@@ -23,7 +23,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ contact, onUpdate }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Số điện thoại"
+          placeholder="Phone Number"
           keyboardType="phone-pad"
           value={contact.phone}
           onChangeText={(text) => onUpdate("phone", text)}
