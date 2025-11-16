@@ -1,0 +1,258 @@
+@startuml BookFlight_Sequence_Diagram
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam defaultFontSize 14
+skinparam titleFontSize 18
+skinparam participantFontSize 14
+skinparam actorFontSize 14
+
+title Sequence Diagram - BookFlight Feature
+
+actor User
+participant "SearchFlightScreen" as Search
+participant "SearchResultScreen" as Result
+participant "ReturnFlightSelectionScreen" as Return
+participant "PassengerInfoScreen" as Passenger
+participant "PaymentInfoScreen" as Payment
+participant "PaymentMethodScreen" as Method
+participant "BookingConfirmation" as Confirm
+participant "airportService" as AirportAPI
+participant "flightService" as FlightAPI
+participant "apiClient" as API
+database "JSON Server" as DB
+
+== 1. Flight Search Flow ==
+
+User -> Search: Open SearchFlightScreen
+activate Search
+Search -> Search: Load RoundTripForm/OneWayForm
+
+User -> Search: Select departure airport
+Search -> AirportAPI: searchAirports(query)
+activate AirportAPI
+AirportAPI -> API: GET /airports
+activate API
+API -> DB: Query airports
+activate DB
+DB --> API: Return airports list
+deactivate DB
+API --> AirportAPI: Return airports
+deactivate API
+AirportAPI --> Search: Return filtered airports
+deactivate AirportAPI
+Search --> User: Display airport options
+
+User -> Search: Select arrival airport
+Search -> AirportAPI: searchAirports(query)
+activate AirportAPI
+AirportAPI -> API: GET /airports
+activate API
+API -> DB: Query airports
+activate DB
+DB --> API: Return airports list
+deactivate DB
+API --> AirportAPI: Return airports
+deactivate API
+AirportAPI --> Search: Return filtered airports
+deactivate AirportAPI
+Search --> User: Display airport options
+
+User -> Search: Select departure date\n(and return date for Round Trip)
+User -> Search: Adjust passenger count
+User -> Search: Click "Search Flights"
+Search -> Search: Validate form data
+deactivate Search
+
+== 2. Flight Selection Flow (Outbound) ==
+
+Search -> Result: Navigate with search params\n(fromAirportId, toAirportId, departDate, passengers, tripType)
+activate Result
+
+Result -> AirportAPI: getAirportById(fromAirportId, toAirportId)
+activate AirportAPI
+AirportAPI -> API: GET /airports/:id (parallel)
+activate API
+API -> DB: Query airports
+activate DB
+DB --> API: Return airports data
+deactivate DB
+API --> AirportAPI: Return airports
+deactivate API
+AirportAPI --> Result: Return fromAirport, toAirport
+deactivate AirportAPI
+
+Result -> FlightAPI: searchFlights(params)
+activate FlightAPI
+FlightAPI -> API: GET /flights, /airlines, /seatClasses (parallel)
+activate API
+API -> DB: Query all data
+activate DB
+DB --> API: Return data
+deactivate DB
+API --> FlightAPI: Return data
+deactivate API
+
+FlightAPI -> FlightAPI: Filter flights by from/to/date/status\nCombine with airline and seatClasses
+FlightAPI --> Result: Return FlightResult[]
+deactivate FlightAPI
+
+Result --> User: Display outbound flights list
+User -> Result: Select flight and seat class
+Result -> Result: Store selected flight and seatClassId
+deactivate Result
+
+== 3. Flight Selection Flow (Return - Round Trip Only) ==
+
+alt Round Trip
+    Result -> Return: Navigate with outbound flight and return date
+    activate Return
+    
+    Return -> AirportAPI: getAirportById(toAirportId, fromAirportId)
+    activate AirportAPI
+    AirportAPI -> API: GET /airports/:id (parallel)
+    activate API
+    API -> DB: Query airports
+    activate DB
+    DB --> API: Return airports
+    deactivate DB
+    API --> AirportAPI: Return airports
+    deactivate API
+    AirportAPI --> Return: Return swapped airports
+    deactivate AirportAPI
+    
+    Return -> FlightAPI: searchFlights(returnParams)
+    activate FlightAPI
+    FlightAPI -> API: GET /flights, /airlines, /seatClasses (parallel)
+    activate API
+    API -> DB: Query data
+    activate DB
+    DB --> API: Return data
+    deactivate DB
+    API --> FlightAPI: Return data
+    deactivate API
+    FlightAPI -> FlightAPI: Filter and combine data
+    FlightAPI --> Return: Return return FlightResult[]
+    deactivate FlightAPI
+    
+    Return --> User: Display return flights list\nwith outbound flight banner
+    User -> Return: Select return flight and seat class
+    Return -> Return: Store selected return flight and seatClassId
+    deactivate Return
+end
+
+== 4. Passenger Information Flow ==
+
+alt One Way
+    Result -> Passenger: Navigate with flight, airports, passengers
+else Round Trip
+    Return -> Passenger: Navigate with outbound & return flights
+end
+
+activate Passenger
+Passenger --> User: Display passenger form and price summary
+User -> Passenger: Enter passenger details\n(firstName, lastName, birthDate)\nand contact info (email, phone)
+User -> Passenger: Click "Continue"
+Passenger -> Passenger: validateForm()\nValidate all fields and formats\nCalculate total prices
+deactivate Passenger
+
+== 5. Payment Confirmation Flow ==
+
+Passenger -> Payment: Navigate with all booking data
+activate Payment
+Payment -> Payment: Calculate total price and breakdown
+Payment --> User: Display flight info, price details,\nand passenger information
+
+User -> Payment: Review booking details
+User -> Payment: Click "Proceed to Payment"
+deactivate Payment
+
+== 6. Payment Method Flow ==
+
+Payment -> Method: Navigate with bookingPayload
+activate Method
+Method --> User: Display payment methods\n(Momo, VNPay, Credit Card)
+
+User -> Method: Select payment method\nand click "Proceed to Payment"
+
+Method -> API: GET /seatClasses/:id\nGET /bookingSegments?seatClassId=...
+activate API
+API -> DB: Check seat availability
+activate DB
+DB --> API: Return seat class and booking data
+deactivate DB
+API --> Method: Return availability data
+deactivate API
+
+Method -> Method: Calculate available seats\nand validate sufficient seats
+
+alt Insufficient Seats
+    Method --> User: Alert "Insufficient Seats"
+else Seats Available
+    Method -> Method: Simulate payment processing (1.2s)\nGenerate confirmation code
+    
+    Method -> API: POST /bookingOrders
+    activate API
+    API -> DB: Create booking order (Confirmed status)
+    activate DB
+    DB --> API: Return created booking
+    deactivate DB
+    API --> Method: Return booking order
+    deactivate API
+    
+    Method -> API: POST /bookingSegments (outbound/return)
+    activate API
+    API -> DB: Create booking segments
+    activate DB
+    DB --> API: Return segments
+    deactivate DB
+    API --> Method: Return segments
+    deactivate API
+    
+    loop For each passenger
+        Method -> API: POST /passengers
+        activate API
+        API -> DB: Create passenger records
+        activate DB
+        DB --> API: Return passengers
+        deactivate DB
+        API --> Method: Return passengers
+        deactivate API
+    end
+    
+    loop For each segment × passenger
+        Method -> API: POST /bookingPassengers
+        activate API
+        API -> DB: Create booking passenger mappings
+        activate DB
+        DB --> API: Return mappings
+        deactivate DB
+        API --> Method: Return mappings
+        deactivate API
+    end
+    deactivate Method
+end
+
+== 7. Booking Confirmation Flow ==
+
+Method -> Confirm: Navigate with booking, segments, passengers
+activate Confirm
+
+Confirm -> API: GET /seatClasses/:id\nGET /flights/:id\nGET /airports/:id
+activate API
+API -> DB: Query seat classes, flights, and airports
+activate DB
+DB --> API: Return all data
+deactivate DB
+API --> Confirm: Return complete data
+deactivate API
+
+Confirm --> User: Display success message,\nconfirmation code, total amount,\nbooking date, contact info,\nand E-tickets with QR codes
+
+User -> Confirm: Click "Back to Home"
+Confirm -> Confirm: Animate airplane and reset navigation
+Confirm --> User: Navigate to Home screen
+deactivate Confirm
+
+@enduml

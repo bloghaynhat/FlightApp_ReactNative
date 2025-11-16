@@ -1,0 +1,40 @@
+@startuml FlightApp_C4_Architecture
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/react.puml
+!include DEVICONS/nodejs.puml
+!include DEVICONS/database.puml
+!include FONTAWESOME/mobile.puml
+!include FONTAWESOME/server.puml
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+
+title C4 Container Diagram - Flight Booking Application
+
+Person(user, "Mobile User", "A customer who wants to book flight tickets", $sprite="users")
+
+System_Boundary(flightapp, "Flight Booking System") {
+    
+    Container(mobile, "Mobile Application", "React Native, Expo, TypeScript", "Provides flight booking functionality to users via mobile devices", $sprite="mobile")
+    
+    ContainerDb(jsonserver, "JSON Server", "REST API Server", "Provides RESTful API endpoints for CRUD operations on flight data", $sprite="server")
+    
+    ContainerDb(database, "JSON Database", "db.json file", "Stores all flight, booking, passenger and airport information", $sprite="database")
+}
+
+System_Ext(expo, "Expo Platform", "Build, deploy and manage React Native apps")
+System_Ext(payment, "Payment Gateway", "Momo, VNPay, Credit Card (Mock)")
+
+' Relationships
+Rel(user, mobile, "Books flights, views tickets", "Mobile App")
+Rel(mobile, jsonserver, "Makes API calls to", "HTTP/REST, JSON")
+Rel(jsonserver, database, "Reads from and writes to", "File I/O")
+Rel(mobile, expo, "Built and deployed via", "Expo SDK")
+Rel(mobile, payment, "Processes payments via", "Mock Payment")
+
+SHOW_LEGEND()
+
+@enduml

@@ -9,7 +9,8 @@ type TicketProps = {
   passengerName: string;
   flightNumber?: string;
   date?: string; // ISO date
-  time?: string; // time string
+  time?: string; // departure time string
+  arrivalTime?: string; // arrival time string
   seat?: string;
   gate?: string;
   bookingCode?: string;
@@ -26,6 +27,7 @@ const Ticket: React.FC<TicketProps> = ({
   flightNumber,
   date,
   time,
+  arrivalTime,
   seat,
   gate,
   bookingCode,
@@ -69,7 +71,7 @@ const Ticket: React.FC<TicketProps> = ({
         </View>
 
         <View style={styles.routeBlock}>
-          <Text style={styles.timeText}>{time ?? "-"}</Text>
+          <Text style={styles.timeText}>{arrivalTime ?? time ?? "-"}</Text>
           <Text style={styles.airportCode}>{toCode}</Text>
           <Text style={styles.city}>{toName}</Text>
         </View>
