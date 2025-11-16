@@ -28,14 +28,16 @@ const FlightLookupScreen: React.FC = () => {
     setLoading(true);
     setBpResults([]);
     try {
-      const id = bookingPassengerId.trim();
+      const id = bookingPassengerId.trim().toUpperCase();
       if (!id) {
         setError("Please enter reservation number (e.g. BP123)");
         setLoading(false);
         return;
       }
-      const resp = await apiClient.get(`/bookingPassengers?id=${encodeURIComponent(id)}`);
-      const bps: any[] = Array.isArray(resp.data) ? resp.data : [];
+      // Search case-insensitive by fetching all and filtering
+      const resp = await apiClient.get(`/bookingPassengers`);
+      const allBps: any[] = Array.isArray(resp.data) ? resp.data : [];
+      const bps = allBps.filter((bp) => bp.id.toUpperCase() === id);
       if (bps.length === 0) {
         setError("Reservation number not found");
         setLoading(false);
@@ -200,6 +202,10 @@ const FlightLookupScreen: React.FC = () => {
                   : "-";
                 const dep = flight?.departureTime ?? "";
                 const time = dep ? new Date(dep).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+                const arr = flight?.arrivalTime ?? "";
+                const arrivalTime = arr
+                  ? new Date(arr).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                  : time;
                 return (
                   <Ticket
                     key={bp.id}
@@ -211,6 +217,7 @@ const FlightLookupScreen: React.FC = () => {
                     flightNumber={flight?.flightNumber ?? ""}
                     date={dep}
                     time={time}
+                    arrivalTime={arrivalTime}
                     seat={bp.seatNumber ?? ""}
                     bookingCode={String(bp.id)}
                     seatClass={seatClass?.className ?? ""}

@@ -1,0 +1,94 @@
+@startuml FlightApp_Deployment_Diagram
+!theme aws-orange
+skinparam defaultFontSize 13
+skinparam titleFontSize 18
+skinparam packageFontSize 14
+skinparam nodeFontSize 13
+
+title Deployment Diagram - Flight Booking Application
+
+' Define nodes with specific styling
+node "User Device" as device #LightBlue {
+    artifact "Mobile App\n(React Native)" as app #4A90E2
+}
+
+node "Development Machine\n(192.168.1.195:3000)" as devmachine #LightGreen {
+    artifact "JSON Server\n(Node.js)" as server #50C878
+    database "db.json" as db #FF6B6B
+}
+
+cloud "Expo Platform" as expo #Orange {
+    artifact "Expo Go\nRuntime" as exporuntime
+    artifact "Build Service\n(EAS)" as buildservice
+}
+
+cloud "External Services" as external #Purple {
+    artifact "Payment Gateway\n(Mock)" as payment
+}
+
+' Relationships
+device --> expo : "Download &\nRun via"
+app --> exporuntime : "Runs on"
+app --> server : "HTTP/REST\nPort 3000"
+server --> db : "Read/Write"
+app --> payment : "Mock Payment"
+
+' Notes
+note right of app
+  **Technologies:**
+  - React Native 0.81.5
+  - Expo SDK ~54.0.20
+  - TypeScript 5.9.2
+  - React Navigation 7.x
+  - Axios 1.13.1
+  
+  **Features:**
+  • Search Flights
+  • Book Tickets
+  • Payment Processing
+  • Ticket Lookup
+  • QR Code Generation
+end note
+
+note left of server
+  **JSON Server:**
+  - Version: 1.0.0-beta.3
+  - Protocol: HTTP
+  - Port: 3000
+  - Host: 0.0.0.0
+  
+  **Endpoints:**
+  GET/POST /airports
+  GET/POST /flights
+  GET/POST /bookingOrders
+  GET/POST /passengers
+  GET/POST /bookingSegments
+  GET/POST /bookingPassengers
+end note
+
+note bottom of db
+  **Database Collections:**
+  • airports (8 records)
+  • flights
+  • airlines (4 records)
+  • seatClasses
+  • bookingOrders
+  • bookingSegments
+  • passengers
+  • bookingPassengers
+end note
+
+legend right
+  **Deployment Environment:**
+  |= Component |= Location |
+  | Mobile App | Android/iOS Device |
+  | Backend API | Development Machine |
+  | Database | Local JSON File |
+  
+  **Network:**
+  • Local Network (LAN)
+  • IP: 192.168.1.195
+  • Protocol: HTTP
+endlegend
+
+@enduml

@@ -1,0 +1,97 @@
+@startuml FlightApp_Complete_Architecture
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_LEFT_RIGHT()
+LAYOUT_WITH_LEGEND()
+
+title Flight Booking Application - Complete Architecture
+
+' ==================== ACTORS ====================
+Person(user, "Mobile User", "A customer who wants to book flight tickets")
+
+' ==================== MAIN SYSTEM ====================
+System_Boundary(flightapp, "Flight Booking System") {
+    
+    Container(mobile, "Mobile Application", "React Native 0.81.5, Expo SDK, TypeScript", "Provides flight booking functionality to users via mobile devices:\n• Search & Book Flights\n• Payment Processing\n• Ticket Lookup\n• QR Code Generation")
+    
+    Container(jsonserver, "JSON Server", "Node.js, JSON Server 1.0.0-beta.3", "Provides RESTful API endpoints for CRUD operations:\n• GET/POST /airports\n• GET/POST /flights\n• GET/POST /bookingOrders\n• GET/POST /passengers\n• GET/POST /bookingSegments")
+    
+    ContainerDb(database, "JSON Database", "db.json file", "Stores all flight, booking, passenger and airport information:\n• airports (8 records)\n• flights & airlines\n• seatClasses\n• bookingOrders & bookingSegments\n• passengers & bookingPassengers")
+}
+
+' ==================== EXTERNAL SYSTEMS ====================
+System_Ext(expo, "Expo Platform", "Build, deploy and manage React Native apps")
+System_Ext(payment, "Payment Gateway", "Momo, VNPay, Credit Card (Mock)")
+
+' ==================== RELATIONSHIPS ====================
+Rel_R(user, mobile, "Books flights, views tickets", "Mobile App UI")
+
+Rel_R(mobile, jsonserver, "Makes API calls to", "HTTP/REST, JSON, Port 3000")
+
+Rel_R(jsonserver, database, "Reads from and writes to", "File I/O")
+
+Rel_U(mobile, expo, "Built and deployed via", "Expo SDK")
+
+Rel_D(mobile, payment, "Processes payments via", "Mock Payment API")
+
+' ==================== NOTES ====================
+note right of mobile
+  **Frontend Technologies:**
+  • React Native 0.81.5
+  • Expo SDK ~54.0.20
+  • TypeScript 5.9.2
+  • React Navigation 7.x
+  • Axios 1.13.1
+  
+  **Key Features:**
+  → Search Flights (One-way/Round-trip)
+  → Select Flights & Seat Class
+  → Enter Passenger Information
+  → Complete Payment
+  → View E-tickets with QR Codes
+  → Lookup Bookings
+end note
+
+note left of jsonserver
+  **Backend Configuration:**
+  • Protocol: HTTP
+  • Port: 3000
+  • Host: 0.0.0.0 (LAN accessible)
+  • Hot reload support
+  
+  **API Architecture:**
+  → RESTful API Design
+  → Automatic CRUD operations
+  → JSON request/response
+  → No authentication (Development)
+end note
+
+note bottom of database
+  **Database Schema:**
+  → Normalized relational structure
+  → Foreign key relationships
+  → Support for One-way & Round-trip
+  → Multiple passengers per booking
+  → Multiple seat classes per flight
+  → Complete booking history
+end note
+
+' ==================== DEPLOYMENT DETAILS ====================
+note right of flightapp
+  **Deployment Architecture:**
+  
+  **User Device (Android/iOS):**
+  • Platform: Android/iOS
+  • Runtime: Expo Go
+  • Network: Local LAN/WiFi
+  
+  **Development Machine:**
+  • IP: 192.168.1.195
+  • Port: 3000
+  • Protocol: HTTP
+  • Runtime: Node.js
+end note
+
+SHOW_LEGEND()
+
+@enduml

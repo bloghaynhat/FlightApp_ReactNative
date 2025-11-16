@@ -1,0 +1,122 @@
+@startuml FlightLookup_Sequence_Diagram
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam defaultFontSize 14
+skinparam titleFontSize 18
+skinparam participantFontSize 14
+skinparam actorFontSize 14
+
+title Sequence Diagram - Flight Lookup Feature
+
+actor User
+participant "FlightLookupScreen" as Lookup
+participant "apiClient" as API
+database "JSON Server" as DB
+
+== Flight Lookup Flow ==
+
+User -> Lookup: Open Lookup screen (Profile tab)
+activate Lookup
+Lookup --> User: Display search interface
+
+User -> Lookup: Enter reservation number\n(bookingPassenger ID)
+User -> Lookup: Click "Search Booking"
+
+Lookup -> Lookup: Validate input\n(check if ID is not empty)
+
+alt Invalid Input
+    Lookup --> User: Show error\n"Please enter reservation number"
+else Valid Input
+    Lookup -> Lookup: Set loading state
+    
+    Lookup -> API: GET /bookingPassengers?id=...
+    activate API
+    API -> DB: Query booking passengers by ID
+    activate DB
+    DB --> API: Return booking passenger records
+    deactivate DB
+    API --> Lookup: Return bookingPassengers[]
+    deactivate API
+    
+    alt No Results Found
+        Lookup --> User: Show error\n"Reservation number not found"
+    else Results Found
+        loop For each bookingPassenger
+            Lookup -> API: GET /bookingSegments/:id
+            activate API
+            API -> DB: Query booking segment
+            activate DB
+            DB --> API: Return segment data
+            deactivate DB
+            API --> Lookup: Return segment
+            deactivate API
+            
+            Lookup -> API: GET /bookingOrders/:id
+            activate API
+            API -> DB: Query booking order
+            activate DB
+            DB --> API: Return booking order data
+            deactivate DB
+            API --> Lookup: Return booking order
+            deactivate API
+            
+            Lookup -> API: GET /passengers/:id
+            activate API
+            API -> DB: Query passenger info
+            activate DB
+            DB --> API: Return passenger data
+            deactivate DB
+            API --> Lookup: Return passenger
+            deactivate API
+            
+            Lookup -> API: GET /seatClasses/:id
+            activate API
+            API -> DB: Query seat class
+            activate DB
+            DB --> API: Return seat class data
+            deactivate DB
+            API --> Lookup: Return seat class
+            deactivate API
+            
+            Lookup -> API: GET /flights/:id
+            activate API
+            API -> DB: Query flight details
+            activate DB
+            DB --> API: Return flight data
+            deactivate DB
+            API --> Lookup: Return flight
+            deactivate API
+            
+            Lookup -> API: GET /airports/:fromId\nGET /airports/:toId
+            activate API
+            API -> DB: Query airports
+            activate DB
+            DB --> API: Return airports data
+            deactivate DB
+            API --> Lookup: Return from/to airports
+            deactivate API
+            
+            Lookup -> Lookup: Combine all data into ticket object:\n- bookingPassenger\n- segment\n- booking order\n- passenger info\n- flight details\n- seat class\n- airports
+        end
+        
+        Lookup --> User: Display tickets list with:\n- Flight number\n- From/To airports\n- Passenger name\n- Departure date/time\n- Seat number\n- Booking code\n- Seat class\n- QR code
+    end
+end
+
+User -> Lookup: View ticket details
+note right of User
+    User can see all their
+    booked tickets with
+    complete information
+    including QR codes
+end note
+
+alt User wants to go home
+    User -> Lookup: Click close button
+    Lookup -> Lookup: Navigate to Home screen
+    deactivate Lookup
+end
+
+@enduml

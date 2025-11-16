@@ -5,12 +5,14 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 ## 📱 Features
 
 ### 🏠 Home Screen
+
 - Beautiful carousel showcasing promotional destinations
 - Quick access to popular destinations
 - Direct navigation to flight search
 - Clean, modern UI with intuitive navigation
 
 ### 🔍 Flight Search
+
 - **Multiple search modes:**
   - One-way flights
   - Round-trip flights
@@ -21,6 +23,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
   - Seat class selection (Economy, Business, First Class)
 
 ### 🎫 Flight Selection
+
 - Browse available flights with detailed information
 - Real-time pricing and availability
 - Flight details including:
@@ -31,6 +34,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 - Select return flights for round-trip bookings
 
 ### 👤 Passenger Information
+
 - Add multiple passengers
 - Comprehensive passenger details:
   - Full name
@@ -41,6 +45,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 - Form validation for data accuracy
 
 ### 💳 Payment & Booking
+
 - Multiple payment methods:
   - Credit/Debit cards
   - E-wallets (Momo, ZaloPay, VNPay)
@@ -50,6 +55,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 - Collapsible sections for easy navigation
 
 ### ✅ Booking Confirmation
+
 - Booking success confirmation
 - Display booking details:
   - Total amount paid
@@ -60,6 +66,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 - Unique reservation numbers
 
 ### 🔎 Flight Lookup
+
 - Track bookings using reservation number
 - View all ticket details
 - No login required
@@ -68,6 +75,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 ## 🛠️ Technology Stack
 
 ### Frontend
+
 - **React Native** - Cross-platform mobile development
 - **Expo** - Development platform and tooling
 - **TypeScript** - Type-safe JavaScript
@@ -76,6 +84,7 @@ A modern, user-friendly flight booking mobile application built with React Nativ
   - Stack Navigation
 
 ### UI/UX
+
 - **React Native Vector Icons** - Beautiful icon sets
 - **Expo Linear Gradient** - Gradient backgrounds
 - **React Native Calendars** - Date selection
@@ -83,24 +92,28 @@ A modern, user-friendly flight booking mobile application built with React Nativ
 - **React Native Safe Area Context** - Safe area handling
 
 ### Backend & Data
+
 - **JSON Server** - Mock REST API
 - **Axios** - HTTP client for API calls
 
 ## 📦 Installation
 
 ### Prerequisites
+
 - Node.js (v18 or higher)
 - npm or yarn
 - Expo CLI
 - Android Studio (for Android development) or Xcode (for iOS development)
 
 ### Step 1: Clone the Repository
+
 ```bash
 git clone https://github.com/bloghaynhat/FlightApp_ReactNative.git
 cd FlightApp
 ```
 
 ### Step 2: Install Dependencies
+
 ```bash
 npm install
 # or
@@ -108,7 +121,9 @@ yarn install
 ```
 
 ### Step 3: Start the JSON Server (Backend)
+
 Open a new terminal window and run:
+
 ```bash
 npm run server
 # or
@@ -118,7 +133,9 @@ json-server --watch server/db.json --port 3000 --host 0.0.0.0
 The API server will start at `http://localhost:3000`
 
 ### Step 4: Start the Expo Development Server
+
 In another terminal window:
+
 ```bash
 npm start
 # or
@@ -128,6 +145,7 @@ expo start
 ### Step 5: Run on Device/Emulator
 
 #### For Android:
+
 ```bash
 npm run android
 # or
@@ -135,6 +153,7 @@ expo start --android
 ```
 
 #### For iOS:
+
 ```bash
 npm run ios
 # or
@@ -142,6 +161,7 @@ expo start --ios
 ```
 
 #### For Web:
+
 ```bash
 npm run web
 # or
@@ -222,37 +242,44 @@ FlightApp/
 The JSON Server provides the following endpoints:
 
 ### Airports
+
 - `GET /airports` - Get all airports
 - `GET /airports/:id` - Get airport by ID
 
 ### Flights
+
 - `GET /flights` - Get all flights
 - `GET /flights/:id` - Get flight by ID
 - Search: `GET /flights?departureAirportId=X&arrivalAirportId=Y`
 
 ### Seat Classes
+
 - `GET /seatClasses` - Get all seat classes
 - `GET /seatClasses/:id` - Get seat class by ID
 
 ### Bookings
+
 - `GET /bookingOrders` - Get all booking orders
 - `POST /bookingOrders` - Create new booking
 - `GET /bookingSegments` - Get booking segments
 - `GET /bookingPassengers` - Get booking passengers
 
 ### Passengers
+
 - `GET /passengers` - Get all passengers
 - `POST /passengers` - Create new passenger
 
 ## 🎨 Design Highlights
 
 ### Color Scheme
+
 - **Primary Blue**: `#0070BB` - Main brand color
 - **Orange Accent**: `#f59e0b` - Highlights and CTAs
 - **Light Gray**: `#f8f9fb` - Backgrounds
 - **White**: `#fff` - Cards and surfaces
 
 ### Key Features
+
 - **Consistent Design Language** - Unified styling across all screens
 - **Safe Area Support** - Proper handling of notches and system UI
 - **Responsive Layout** - Adapts to different screen sizes
@@ -265,6 +292,7 @@ The JSON Server provides the following endpoints:
 ### How to Book a Flight
 
 1. **Search for Flights**
+
    - Tap "Book" from the bottom navigation
    - Select trip type (One-way, Round-trip, or Multi-city)
    - Choose departure and arrival airports
@@ -273,18 +301,21 @@ The JSON Server provides the following endpoints:
    - Tap "Search Flights"
 
 2. **Select Your Flight**
+
    - Browse available flights
    - Review flight details (time, duration, price)
    - Tap "Select" on your preferred flight
    - For round-trips, select return flight
 
 3. **Enter Passenger Information**
+
    - Add passenger details for each traveler
    - Fill in required fields (name, DOB, passport, etc.)
    - Verify contact information
    - Tap "Continue"
 
 4. **Review and Pay**
+
    - Review flight summary
    - Check passenger information
    - Review pricing breakdown
@@ -300,10 +331,12 @@ The JSON Server provides the following endpoints:
 ### How to Look Up a Booking
 
 1. **Access Lookup**
+
    - Tap "Lookup" from the bottom navigation
    - Or tap "Track Flight" on the home screen
 
 2. **Enter Reservation Number**
+
    - Type your reservation number (e.g., BP01)
    - Tap "Search Booking"
 
@@ -315,20 +348,25 @@ The JSON Server provides the following endpoints:
 ## 🔧 Configuration
 
 ### API Base URL
+
 Update the API base URL in `apis/apiClient.ts`:
+
 ```typescript
 const apiClient = axios.create({
-  baseURL: 'http://YOUR_IP_ADDRESS:3000',
+  baseURL: "http://YOUR_IP_ADDRESS:3000",
   timeout: 10000,
 });
 ```
 
 **Note:** For Android emulator, use:
+
 - `http://10.0.2.2:3000` (Android Studio emulator)
 - `http://YOUR_LOCAL_IP:3000` (Physical device)
 
 ### App Configuration
+
 Edit `app.json` to customize:
+
 - App name
 - App icon
 - Splash screen
@@ -340,22 +378,26 @@ Edit `app.json` to customize:
 ### Common Issues
 
 **1. Cannot connect to JSON Server**
+
 - Ensure JSON Server is running on port 3000
 - Check your IP address in `apiClient.ts`
 - For physical devices, use your local network IP
 - Verify firewall settings
 
 **2. Module not found errors**
+
 - Clear cache: `expo start -c`
 - Reinstall dependencies: `rm -rf node_modules && npm install`
 - Check TypeScript definitions in `types/` folder
 
 **3. Android/iOS build issues**
+
 - Clear Expo cache: `expo start -c`
 - Clear Metro cache: `npx react-native start --reset-cache`
 - Rebuild: `cd android && ./gradlew clean` (Android)
 
 **4. Calendar picker not working**
+
 - Ensure `react-native-calendars` is properly installed
 - Check date format in DateRangePicker component
 
@@ -379,9 +421,11 @@ This project is created for educational purposes.
 ## 👨‍💻 Developer
 
 **Minh Đức**
+
 - GitHub: [@bloghaynhat](https://github.com/bloghaynhat)
 
 **Trọng Nhân**
+
 - GitHub: [@NhanItJAVA1](https://github.com/NhanItJAVA1)
 
 ## 🙏 Acknowledgments

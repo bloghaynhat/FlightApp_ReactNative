@@ -134,6 +134,7 @@ const PaymentMethodScreen: React.FC = () => {
             seatClassId: bookingPayload.selectedSeatClassId,
             numSeats: needed,
             status: "Confirmed",
+            selectedDate: bookingPayload.departDate, // Store selected departure date
           };
           const segResp = await apiClient.post("/bookingSegments", segBody);
           if (segResp.status === 201) segmentsCreated.push(segResp.data);
@@ -147,6 +148,7 @@ const PaymentMethodScreen: React.FC = () => {
             seatClassId: bookingPayload.selectedReturnSeatClassId,
             numSeats: needed,
             status: "Confirmed",
+            selectedDate: bookingPayload.returnDate, // Store selected return date
           };
           const segResp = await apiClient.post("/bookingSegments", segBody);
           if (segResp.status === 201) segmentsCreated.push(segResp.data);
@@ -165,12 +167,23 @@ const PaymentMethodScreen: React.FC = () => {
           if (pResp.status === 201) createdPassengers.push(pResp.data);
         }
 
+        // Helper function to generate seat number
+        const generateSeatNumber = (passengerIndex: number, segmentIndex: number): string => {
+          // Generate seat row (10-30) and letter (A-F)
+          const baseRow = 10 + Math.floor((passengerIndex + segmentIndex * 5) / 6);
+          const seatLetters = ["A", "B", "C", "D", "E", "F"];
+          const seatLetter = seatLetters[passengerIndex % 6];
+          return `${baseRow}${seatLetter}`;
+        };
+
         // Create bookingPassengers mapping entries for each segment × passenger
         const createdBookingPassengers: any[] = [];
-        for (const seg of segmentsCreated) {
+        for (let segIndex = 0; segIndex < segmentsCreated.length; segIndex++) {
+          const seg = segmentsCreated[segIndex];
           for (let i = 0; i < createdPassengers.length; i++) {
             const p = createdPassengers[i];
-            const bpBody = { bookingSegmentId: seg.id, passengerId: p.id, seatNumber: null };
+            const seatNumber = generateSeatNumber(i, segIndex);
+            const bpBody = { bookingSegmentId: seg.id, passengerId: p.id, seatNumber };
             const bpResp = await apiClient.post("/bookingPassengers", bpBody);
             if (bpResp.status === 201) createdBookingPassengers.push(bpResp.data);
           }
