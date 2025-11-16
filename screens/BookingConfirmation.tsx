@@ -221,6 +221,9 @@ const BookingConfirmation: React.FC = () => {
                       const time = flight?.departureTime
                         ? new Date(flight.departureTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                         : segment.time ?? "";
+                      const arrivalTime = flight?.arrivalTime
+                        ? new Date(flight.arrivalTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : time;
                       const seat = bp.seatNumber ?? segment.seatNumber ?? "";
                       const bookingCode = bp.id ?? "";
                       const seatClass = seatClassMap[segment.seatClassId]?.className ?? segment.seatClassId ?? "";
@@ -236,6 +239,7 @@ const BookingConfirmation: React.FC = () => {
                           flightNumber={flightNumber}
                           date={date}
                           time={time}
+                          arrivalTime={arrivalTime}
                           seat={seat}
                           bookingCode={String(bookingCode)}
                           seatClass={seatClass}
